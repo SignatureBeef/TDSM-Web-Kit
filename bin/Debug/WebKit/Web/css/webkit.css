@@ -1,0 +1,96 @@
+body
+{
+	font: 62.5% "Trebuchet MS", sans-serif;				
+	margin:	50px;
+}
+
+#background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#background2 {
+	position: fixed;
+	top: 73.5%;
+	left: 40%;
+	width: 300;
+	height: 150;
+}
+
+fieldset {
+	-moz-border-radius:5px;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+#ChatForm
+{
+	width: 85.5%;
+	height: 400px;
+	border: 1.5px solid gray;
+	float: right;
+}
+
+#UserList
+{
+	display: inline-block;
+	width: 14%;
+	height: 400px;
+	border:	1.5px solid gray;
+}
+
+#UserList div
+{
+	width: 100%;
+}
+
+#UserList div:hover
+{
+	background-color: gray;
+}
+
+.ui-tabs-disabled {
+    display: none;
+} 
+
+.ChatMessage
+{
+	font-size: 9pt;
+	width: 100%;
+}
+
+.ChatMessage:hover
+{
+	background-color: gray;
+}
+
+#InputBar
+{
+	width: 100%;
+	border: 1px solid gray;
+	margin-top: 2px;
+}
+
+input {
+	background-color: #EEE;
+	padding: 5px;
+	border: 1px solid #CCC;
+}
+
+.ChatMessageNames
+{
+	margin-left: 2px;
+}
+
+#statTable tr td
+{
+	font-size: 9pt;
+}
+
+#loginTable tr td
+{
+	font-size: 9pt;
+}

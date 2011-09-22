@@ -1,0 +1,1 @@
+var MaxChatLines = 300;
