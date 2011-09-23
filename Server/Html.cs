@@ -59,7 +59,7 @@ namespace WebKit.Server
             try
             {
                 if (!File.Exists(requestData))
-                    SendData(requestData, context, File.ReadAllBytes("Sorry that page is not found."));
+                    SendData(requestData, context, ASCIIEncoding.ASCII.GetBytes("Sorry that page is not found."));
                 else
                     SendData(requestData, context, File.ReadAllBytes(requestData));
             }
