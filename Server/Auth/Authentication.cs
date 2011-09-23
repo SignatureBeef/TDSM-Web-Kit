@@ -24,7 +24,9 @@ namespace WebKit.Server.Auth
         {
             if (!File.Exists(CredentialPath))
             {
-                string Header = "#Format: username:sha1hash\n#Lines starting with '#' will not be read\n\n";
+                string user = "admin", pass = HashString(user);
+                string Header = "#Format: username:sha1hash\n#Lines starting with '#' will not be read\n\n" +
+                    user + ":" + pass;
 
                 try
                 {
@@ -33,7 +35,7 @@ namespace WebKit.Server.Auth
                 catch (Exception e)
                 {
                     ProgramLog.Log(e);
-                }                
+                }
             }
         }
 

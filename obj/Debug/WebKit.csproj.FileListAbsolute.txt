@@ -13,3 +13,11 @@ E:\WebKit\bin\Debug\Terraria_Server.xml
 E:\WebKit\obj\Debug\ResolveAssemblyReference.cache
 E:\WebKit\obj\Debug\WebKit.dll
 E:\WebKit\obj\Debug\WebKit.pdb
+E:\TDSM_WebKit\obj\Debug\ResolveAssemblyReference.cache
+E:\TDSM_WebKit\obj\Debug\WebKit.dll
+E:\TDSM_WebKit\obj\Debug\WebKit.pdb
+E:\TDSM_WebKit\bin\Debug\WebKit.dll
+E:\TDSM_WebKit\bin\Debug\WebKit.pdb
+E:\TDSM_WebKit\bin\Debug\Terraria_Server.exe
+E:\TDSM_WebKit\bin\Debug\Terraria_Server.pdb
+E:\TDSM_WebKit\bin\Debug\Terraria_Server.xml
