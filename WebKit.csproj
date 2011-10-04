@@ -56,6 +56,7 @@
     <Compile Include="Server\JsonData\Packets\Config.cs" />
     <Compile Include="Server\JsonData\Packets\Credentials.cs" />
     <Compile Include="Server\JsonData\Packets\IPacket.cs" />
+    <Compile Include="Server\JsonData\Packets\PlayerMonitor.cs" />
     <Compile Include="Server\JsonData\Packets\SessionAuth.cs" />
     <Compile Include="Server\JsonData\Packets\Status.cs" />
     <Compile Include="Server\JsonData\Packets\Utility.cs" />
@@ -64,8 +65,11 @@
     <Compile Include="Server\JsonData\Parser.cs" />
     <Compile Include="Server\JsonData\WebMessage.cs" />
     <Compile Include="Server\JsonData\Json.cs" />
+    <Compile Include="Server\Misc\MultiArray.cs" />
     <Compile Include="Server\Stats\SystemStats.cs" />
+    <Compile Include="Server\Stats\UserMoniter.cs" />
     <Compile Include="Server\Utility\Utilities.cs" />
+    <Compile Include="Server\Utility\WebSender.cs" />
     <Compile Include="Server\WebServer.cs" />
     <Compile Include="WebKit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

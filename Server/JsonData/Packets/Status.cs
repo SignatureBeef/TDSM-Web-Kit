@@ -7,7 +7,7 @@ using Terraria_Server.Networking;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public class Status : IPacket
+    public struct Status : IPacket
     {
         public string GetPacket()
         {

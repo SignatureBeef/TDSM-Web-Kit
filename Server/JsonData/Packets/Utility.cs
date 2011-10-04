@@ -6,7 +6,7 @@ using WebKit.Server.Utility;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public class Utility : IPacket
+    public struct Utility : IPacket
     {
         public string GetPacket()
         {

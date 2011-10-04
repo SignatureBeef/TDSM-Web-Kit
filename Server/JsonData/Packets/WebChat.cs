@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public class WebChat : IPacket
+    public struct WebChat : IPacket
     {
         public string GetPacket()
         {

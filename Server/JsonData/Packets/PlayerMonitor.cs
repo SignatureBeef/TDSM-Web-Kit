@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WebKit.Server.Stats;
 using Terraria_Server;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public struct WebCommand : IPacket
+    public struct PlayerMonitor : IPacket
     {
         public string GetPacket()
         {
-            return PacketId.WEB_COMMAND;
+            return PacketId.PLAYER_MONITOR;
         }
 
         public Dictionary<String, Object> Process(object[] Data)
@@ -18,9 +19,14 @@ namespace WebKit.Server.JsonData.Packets
             Dictionary<String, Object> array = new Dictionary<String, Object>();
 
             WebKit WebKit = (WebKit)Data[0];
-            string Command = Data[2].ToString();
 
-            Program.commandParser.ParseAndProcess(WebKit.WebSender, Command);
+            var Player = Terraria_Server.Server.GetPlayerByName(Data[2].ToString());
+
+            if (Player == null)
+                array["data"] = "Player is no longer online.";
+            else
+                array["data"] = UserMoniter.SerializePlayer(Player);
+
             return array;
         }
     }

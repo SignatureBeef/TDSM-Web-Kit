@@ -70,5 +70,13 @@ namespace WebKit.Server.JsonData
                 return "util";
             }
         }
+
+        public static string PLAYER_MONITOR
+        {
+            get
+            {
+                return "pdata";
+            }
+        }
     }
 }

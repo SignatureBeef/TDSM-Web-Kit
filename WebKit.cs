@@ -12,17 +12,19 @@ using System.Web.Script.Serialization;
 using Terraria_Server.Plugins;
 using System.Diagnostics;
 using WebKit.Server.Utility;
+using WebKit.Server.Misc;
 
 namespace WebKit
 {
     public class WebKit : BasePlugin
     {
         public WebServer                         WebServer       { get; set; }
-        public Dictionary<String, WebMessage>    UserChat        { get; set; }
+        public MultiArray<String, WebMessage>    UserChat        { get; set; }
         public Dictionary<String, DateTime>      WebSessions     { get; set; }
         public List<Credential>                  CredentialList  { get; set; }
         public Properties                        Properties      { get; set; }
         public string                            ServerStatus    { get; set; }
+        public WebSender                         WebSender       { get; set; }
 
         public static string PluginPath
         {
@@ -58,13 +60,16 @@ namespace WebKit
 
         protected override void Enabled()
         {
-            UserChat = new Dictionary<String, WebMessage>();
+            UserChat = new MultiArray<String, WebMessage>();
             CredentialList = Authentication.GetCredentials();
             WebSessions = new Dictionary<String, DateTime>();
+
+            WebSender = new WebSender(this);
 
             Hook(HookPoints.PlayerChat, OnPlayerChat);
             Hook(HookPoints.PlayerEnteredGame, OnPlayerJoin);
             Hook(HookPoints.PlayerLeftGame, OnPlayerDisconnect);
+            Hook(HookPoints.ConsoleMessageReceived, OnConsoleMessageReceived);
 
             WebServer = new WebServer(Properties.IPAddress, Properties.Port, this);
             WebServer.StartServer();
@@ -95,14 +100,27 @@ namespace WebKit
 
         void OnPlayerJoin(ref HookContext ctx, ref HookArgs.PlayerEnteredGame args)
         {
-            UserChat.Add(DateTime.Now.ToBinary().ToString(),
-                new WebMessage("Server", String.Format(ctx.Sender.Name + " connected from {0}", ctx.Player.IPAddress), "", DateTime.Now));
+            AddChatLine(String.Format(ctx.Sender.Name + " connected from {0}", ctx.Player.IPAddress));
         }
 
         void OnPlayerDisconnect(ref HookContext ctx, ref HookArgs.PlayerLeftGame args)
         {
-            UserChat.Add(DateTime.Now.ToBinary().ToString(),
-                new WebMessage("Server", String.Format(ctx.Sender.Name + " diconnected.", ctx.Player.IPAddress), "", DateTime.Now));
+            AddChatLine(ctx.Sender.Name + " diconnected.");
+        }
+
+        void OnConsoleMessageReceived(ref HookContext ctx, ref HookArgs.ConsoleMessageReceived args)
+        {
+            AddChatLine(args.Message);
+        }
+
+        public void AddChatLine(string ServerMessage, string Sender = "Server")
+        {
+            string time = DateTime.Now.ToBinary().ToString();
+            if (UserChat.ContainsKey(time))
+                time = DateTime.Now.AddMilliseconds(-1).ToBinary().ToString();
+
+            UserChat.Add(time,
+                new WebMessage(Sender, ServerMessage, "", DateTime.Now));
         }
     }
 }

@@ -6,7 +6,7 @@ using WebKit.Server.Auth;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public class Credentials : IPacket
+    public struct Credentials : IPacket
     {
         public string GetPacket()
         {

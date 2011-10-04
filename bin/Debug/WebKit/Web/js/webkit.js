@@ -123,6 +123,26 @@
 		});
 	}
 	
+	function ReceiveUserData() {
+		var Player = $(this).text();
+		
+		$("#UserDataForm").empty();
+		
+		$.getJSON(dataSource + "?request=pdata&user=" + Player, function (data) {
+				if (data)
+				{
+					var PlayerData = data["data"];
+					
+					for (var i in data['data']) {
+						var info = data['data'][i];
+						//$("#UserDataForm").append("<div class='UserMonitorNames'>" + info + "</div");
+						//$("#UserDataForm").text($("#UserDataForm").text() + "\n" + info);
+						AppendUserData(info);
+					}
+				}
+		});
+	}
+	
 	function ReceiveServerStats() {
 		$.getJSON(dataSource + "?request=stats", function (data) {
 			if (data)
@@ -134,10 +154,21 @@
 				$("#phyMem").text(data["phymem"]);
 				
 				$("#UserList").empty();
+				$("#PlayerDataList").empty();
 
+				var players = false;
 				for (var i in data['userlist']) {
 					name = data['userlist'][i];
 					$("#UserList").append("<div class='ChatMessageNames'>" + name + "</div>");
+					$("#PlayerDataList").append("<div class='UserMonitorNames'>" + name + "</div>");
+					
+					$(".UserMonitorNames").click(ReceiveUserData);
+					players = true;
+				}
+				
+				if(!players) {
+					$("#UserList").append("<div class='ChatMessageNames'>No Players online</div>");
+					$("#PlayerDataList").append("<div class='ChatMessageNames'>No Players online</div>");
 				}
 
 				if (data['ready']) {
@@ -147,24 +178,43 @@
 		});
 	}
 
-	function AppendChat(Sender, Rank, Message) {
+	function AppendLine(ClassName, Form, InnerHTML) {
 		lineEntry = document.createElement("div");
-		lineEntry.className = "ChatMessage";
+		lineEntry.className = ClassName;		
+		
+		lineEntry.innerHTML = InnerHTML
+
+		if ($("#" + Form).children("div").size() > MaxChatLines) { //Max messages
+			$("#" + Form).children("div").first().remove();
+		}
+
+		chatForm = document.getElementById(Form);
+		chatForm.appendChild(lineEntry);
+		chatForm.scrollTop = chatForm.scrollHeight;
+	}
+	
+	function AppendChat(Sender, Rank, Message) {
+		Message = unescape(Message);
 
 		if(Rank.length > 0) {
 			Rank = "[" + Rank + "]";
 		}
 		
-		Message = unescape(Message);
-		lineEntry.innerHTML = "<span class='ChatMessageNames'>" + Rank + Sender + "</span>:&nbsp;" + Message;
-
-		if ($("#ChatForm").children("div").size() > MaxChatLines) { //Max messages
-			$("#ChatForm").children("div").first().remove();
+		var innerHTML = "<span class='ChatMessageNames'>" + Rank + Sender + "</span>:&nbsp;" + Message;
+		AppendLine("ChatMessage", "ChatForm", innerHTML);
+	}
+	
+	var lastVariable;
+	function AppendUserData(Message) {
+		var split = Message.split(":", 2);
+		
+		var variable = split[0];
+		if(lastVariable == variable) {
+			variable = "";
 		}
-
-		chatForm = document.getElementById("ChatForm");
-		chatForm.appendChild(lineEntry);
-		chatForm.scrollTop = chatForm.scrollHeight;
+		
+		var innerHTML = "<span class='ChatMessageNames'>" + variable + "</span>:&nbsp;" + split[1];
+		AppendLine("ChatMessage", "UserDataForm", innerHTML);
 	}
 
 	var prevStamp = "";

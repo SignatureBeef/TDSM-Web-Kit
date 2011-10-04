@@ -11,6 +11,7 @@ using System.Net;
 using WebKit.Server.Stats;
 using System.Diagnostics;
 using System.IO;
+using WebKit.Server.Misc;
 
 namespace WebKit.Server.JsonData
 {
@@ -53,7 +54,7 @@ namespace WebKit.Server.JsonData
         public static List<WebMessage> GetUserChat(string TimeStamp, WebKit WebKit)
         {
             List<WebMessage> ret = new List<WebMessage>();
-            Dictionary<String, WebMessage> data = WebKit.UserChat;
+            MultiArray<String, WebMessage> data = WebKit.UserChat;
             long timestamp;
             if (long.TryParse(TimeStamp, out timestamp))
             {

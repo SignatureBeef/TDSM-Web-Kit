@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public class Config : IPacket
+    public struct Config : IPacket
     {
         public string GetPacket()
         {
