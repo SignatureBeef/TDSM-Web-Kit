@@ -66,9 +66,9 @@ namespace WebKit
 
             WebSender = new WebSender(this);
 
-            Hook(HookPoints.PlayerChat, OnPlayerChat);
-            Hook(HookPoints.PlayerEnteredGame, OnPlayerJoin);
-            Hook(HookPoints.PlayerLeftGame, OnPlayerDisconnect);
+            Hook(HookPoints.PlayerChat,             OnPlayerChat);
+            Hook(HookPoints.PlayerEnteredGame,      OnPlayerJoin);
+            Hook(HookPoints.PlayerLeftGame,         OnPlayerDisconnect);
             Hook(HookPoints.ConsoleMessageReceived, OnConsoleMessageReceived);
 
             WebServer = new WebServer(Properties.IPAddress, Properties.Port, this);
@@ -94,8 +94,7 @@ namespace WebKit
 
         void OnPlayerChat(ref HookContext ctx, ref HookArgs.PlayerChat args)
         {
-            UserChat.Add(DateTime.Now.ToBinary().ToString(),
-                new WebMessage(ctx.Sender.Name, args.Message, (ctx.Sender.Op) ? "OP" : "RU", DateTime.Now));
+            AddChatLine(args.Message, ctx.Sender.Name, (ctx.Sender.Op) ? "OP" : "RU");
         }
 
         void OnPlayerJoin(ref HookContext ctx, ref HookArgs.PlayerEnteredGame args)
@@ -113,14 +112,14 @@ namespace WebKit
             AddChatLine(args.Message);
         }
 
-        public void AddChatLine(string ServerMessage, string Sender = "Server")
+        public void AddChatLine(string ServerMessage, string Sender = "Server", string Rank = "")
         {
             string time = DateTime.Now.ToBinary().ToString();
             if (UserChat.ContainsKey(time))
                 time = DateTime.Now.AddMilliseconds(-1).ToBinary().ToString();
 
             UserChat.Add(time,
-                new WebMessage(Sender, ServerMessage, "", DateTime.Now));
+                new WebMessage(Sender, ServerMessage, Rank, DateTime.Now));
         }
     }
 }

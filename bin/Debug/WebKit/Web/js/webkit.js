@@ -1,4 +1,4 @@
-	var mainUpdateInterval, dataSource = "data.json";
+	var mainUpdateInterval, authUpdateInterval, dataSource = "data.json";
 	var Loggedin = false;
 	
 	$(function(){
@@ -9,7 +9,7 @@
 		
 		disableTabs();
 		
-		ReceiveAuth();		
+		ReceiveAuth(true, false);		
 	});
 	
 	function CheckKeys(event, Type) {
@@ -62,15 +62,15 @@
 	}
 	
 	function enableTabs() {
-		$("#tabs").tabs('select', 4);
+		$("#tabs").tabs('select', 5);
 		$("#tabs").tabs({disabled: []});
 		
 		$("#tabs").tabs('select', 0);
 	}
 	
 	function disableTabs() {
-		$("#tabs").tabs('select', 4);
-		$("#tabs").tabs({disabled: [1, 2, 3]});
+		$("#tabs").tabs('select', 5);
+		$("#tabs").tabs({disabled: [1, 2, 3, 4]});
 		
 		$("#tabs").tabs('select', 0);
 	}
@@ -78,7 +78,8 @@
 	function startUpdates() {
 		ReceiveConfig();
 		
-		mainUpdateInterval = setInterval(mainUpdates, 1500); //1.5 seconds /check
+		mainUpdateInterval = setInterval(mainUpdates, 2000); //2 seconds /check
+		authUpdateInterval = setInterval(authCheck, 1000 * 30); //30 seconds /check
 	}
 	
 	function mainUpdates() {
@@ -86,22 +87,37 @@
 		ReceiveChatData();
 	}
 	
-	function ReceiveAuth() {
-		$.getJSON(dataSource + "?request=auth", function (data) {
-			if (data)
-			{
-				if(data['auth']) {
-					Loggedin = true;
-					removeLogin();
-					startUpdates();
-					enableTabs();
-					return;
+	function authCheck() {
+		ReceiveAuth(false, true);
+	}
+	
+	function ReceiveAuth(enable, reload) {
+		var checked = false;
+		$.getJSON(dataSource + "?request=auth", 		
+			function (data) {
+				if (data)
+				{
+					if(data['auth']) {
+						checked = true;
+						Loggedin = true;
+						if(enable) {
+							removeLogin();
+							startUpdates();
+							enableTabs();
+						}
+						return;
+					} else {
+						disableTabs();
+						if(reload) {
+							window.location.reload();
+						}
+					}
 				}
-			}
-			
-			Loggedin = false;
-			$("#LoginBtn").click(Login); //Start Login
-		});
+				
+				Loggedin = false;
+				$("#LoginBtn").click(Login); //Start Login
+			}		
+		);
 	}
 	
 	function VerifyPassword(User, Pass) {
