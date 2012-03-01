@@ -17,7 +17,7 @@ using WebKit.Server.Misc;
 namespace WebKit
 {
     public class WebKit : BasePlugin
-    {
+	{
         public WebServer                         WebServer       { get; set; }
         public MultiArray<String, WebMessage>    UserChat        { get; set; }
         public Dictionary<String, DateTime>      WebSessions     { get; set; }
@@ -34,14 +34,17 @@ namespace WebKit
             }
         }
 
+		public WebKit()
+		{
+			Name = "WebKit";
+			Description = "A Web Management plugin for TDSM";
+			Author = "DeathCradle";
+			Version = "1";
+			TDSMBuild = 37;
+		}
+
         protected override void Initialized(object state)
         {
-            base.Name = "WebKit";
-            base.Description = "A Web Management plugin for TDSM";
-            base.Author = "DeathCradle";
-            base.Version = "1";
-            base.TDSMBuild = 36;
-
             ServerStatus = "Online";
 
             if (!Directory.Exists(PluginPath))
@@ -52,7 +55,11 @@ namespace WebKit
 
             Properties = new Properties(PluginPath + Path.DirectorySeparatorChar + "WebKit.config");
             Properties.Load();
-            Properties.pushData();
+			Properties.pushData();
+
+			if (Properties.ServerId == String.Empty)
+				Properties.ServerId = "tdsm-" + Main.rand.Next(0, Int32.MaxValue);
+
             Properties.Save(false);
 
             Authentication.Init();
@@ -94,7 +101,7 @@ namespace WebKit
 
         void OnPlayerChat(ref HookContext ctx, ref HookArgs.PlayerChat args)
         {
-            AddChatLine(args.Message, ctx.Sender.Name, (ctx.Sender.Op) ? "OP" : "RU");
+           // AddChatLine(args.Message, ctx.Sender.Name, (ctx.Sender.Op) ? "OP" : "RU");
         }
 
         void OnPlayerJoin(ref HookContext ctx, ref HookArgs.PlayerEnteredGame args)
@@ -109,7 +116,7 @@ namespace WebKit
 
         void OnConsoleMessageReceived(ref HookContext ctx, ref HookArgs.ConsoleMessageReceived args)
         {
-            AddChatLine(args.Message);
+			AddChatLine(args.Message, ctx.Sender.Name, (ctx.Sender.Op) ? "OP" : "RU");
         }
 
         public void AddChatLine(string ServerMessage, string Sender = "Server", string Rank = "")

@@ -17,6 +17,7 @@ namespace WebKit
             temp = SessionMinutes;
             temp = Port;
             temp = IPAddress;
+			temp = ServerId;
         }
 
         public int MaxChatLines
@@ -55,16 +56,28 @@ namespace WebKit
             }
         }
 
-        public string IPAddress
-        {
-            get
-            {
-                return getValue("ip-address", "*");
-            }
-            set
-            {
-                setValue("ip-address", value);
-            }
-        }
+		public string IPAddress
+		{
+			get
+			{
+				return getValue("ip-address", "*");
+			}
+			set
+			{
+				setValue("ip-address", value);
+			}
+		}
+
+		public string ServerId
+		{
+			get
+			{
+				return getValue("server-id", String.Empty);
+			}
+			set
+			{
+				setValue("server-id", value);
+			}
+		}
     }
 }

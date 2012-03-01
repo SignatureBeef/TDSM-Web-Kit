@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using WebKit.Server.Stats;
 using Terraria_Server.Networking;
+using Terraria_Server;
 
 namespace WebKit.Server.JsonData.Packets
 {
@@ -26,8 +27,9 @@ namespace WebKit.Server.JsonData.Packets
             array["status"] = WebKit.ServerStatus;
             array["time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             array["users"] = Terraria_Server.Networking.ClientConnection.All.Count;
-            array["maxusers"] = SlotManager.MaxSlots;
-            array["userlist"] = Json.GetUserList();
+			array["maxusers"] = SlotManager.MaxSlots;
+			array["userlist"] = Json.GetUserList();
+			array["ready"] = NetPlay.ServerUp;
 
             array["cpu"] = String.Format("{0:0.00}% ({1})",
                 SystemStats.GetCPUUsage(), time);

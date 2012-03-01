@@ -28,7 +28,7 @@ namespace WebKit.Server.Utility
 
                 ProgramLog.Log("Starting the Server");
                 Main.Initialize();
-                WorldIO.LoadWorld(Terraria_Server.Server.World.SavePath);
+                WorldIO.LoadWorld(null, null, World.SavePath);
                 Program.updateThread = new ProgramThread("Updt", Program.UpdateLoop);
                 NetPlay.StartServer();
 

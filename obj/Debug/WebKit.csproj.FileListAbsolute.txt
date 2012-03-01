@@ -21,3 +21,10 @@ E:\TDSM_WebKit\bin\Debug\WebKit.pdb
 E:\TDSM_WebKit\bin\Debug\Terraria_Server.exe
 E:\TDSM_WebKit\bin\Debug\Terraria_Server.pdb
 E:\TDSM_WebKit\bin\Debug\Terraria_Server.xml
+C:\Git\TDSMWebKit\TDSM-Web-Kit\obj\Debug\ResolveAssemblyReference.cache
+C:\Git\TDSMWebKit\TDSM-Web-Kit\obj\Debug\WebKit.dll
+C:\Git\TDSMWebKit\TDSM-Web-Kit\bin\Debug\WebKit.dll
+C:\Git\TDSMWebKit\TDSM-Web-Kit\bin\Debug\WebKit.pdb
+C:\Git\TDSMWebKit\TDSM-Web-Kit\bin\Debug\Terraria_Server.exe
+C:\Git\TDSMWebKit\TDSM-Web-Kit\bin\Debug\Terraria_Server.pdb
+C:\Git\TDSMWebKit\TDSM-Web-Kit\obj\Debug\WebKit.pdb

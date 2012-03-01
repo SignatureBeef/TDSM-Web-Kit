@@ -48,6 +48,12 @@ namespace WebKit.Server
         {
             HttpListener = new HttpListener();
             HttpListener.Prefixes.Add(String.Format("http://{0}:{1}/", IP, Port));
+			//HttpListener.AuthenticationSchemes = AuthenticationSchemes.IntegratedWindowsAuthentication;
+			//HttpListener.AuthenticationSchemes = AuthenticationSchemes.Ntlm;
+			//HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
+			HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
+			//HttpListener.UnsafeConnectionNtlmAuthentication = true;
+			HttpListener.IgnoreWriteExceptions = true;
 
             ConnectList = new Dictionary<String, String>();
 
@@ -91,7 +97,8 @@ namespace WebKit.Server
         {
             try
             {
-                Html.ProcessData(WebKit, (HttpListener)result.AsyncState, result);
+				var listener = result.AsyncState as HttpListener;
+				Html.ProcessData(WebKit, listener, result);
             }
             catch (ObjectDisposedException) { }
             catch (Exception e)

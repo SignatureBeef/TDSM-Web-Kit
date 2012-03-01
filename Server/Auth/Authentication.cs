@@ -75,17 +75,21 @@ namespace WebKit.Server.Auth
 
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < hash.Length; i++)
-            {
-                builder.Append(hash[i].ToString("X2"));
-            }
+				builder.Append(hash[i].ToString("X2"));
+
             return builder.ToString();
         }
 
-        public static bool CompareHash(string toHash, string Hashed)
-        {
-            string hash = HashString(toHash);
-            return hash.ToUpper().Equals(Hashed.ToUpper());
-        }
+		public static string ComputeHash(string user, string password, string serverId)
+		{
+			return HashString(user + serverId + password);
+		}
+
+		public static bool CompareHash(string input, string Hashed)
+		{
+			//string hash = HashString(toHash);
+			return input.ToUpper().Equals(Hashed.ToUpper());
+		}
 
         public static string GetUserHash(string User, WebKit WebKit)
         {
@@ -96,18 +100,19 @@ namespace WebKit.Server.Auth
             return null;
         }
 
-        public static AuthStatus isCredentialsTheSame(string User, string password, WebKit WebKit)
+        public static AuthStatus IsCredentialsTheSame(string User, string password, WebKit WebKit)
         {
             string userHash = GetUserHash(User, WebKit);
-            if (userHash == null)
-            {
-                return AuthStatus.NON_EXISTANT_USER;
-            }
 
-            if (CompareHash(password, userHash))
-            {
-                return AuthStatus.MATCH;
-            }
+			if (userHash == null)
+				return AuthStatus.NON_EXISTANT_USER;
+			else
+			{
+				var hashed = ComputeHash(User, password, WebKit.Properties.ServerId);
+
+				if (CompareHash(hashed, userHash))
+					return AuthStatus.MATCH;
+			}
 
             return AuthStatus.NON_EXISTANT_PASS;
         }

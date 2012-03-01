@@ -22,7 +22,7 @@ namespace WebKit.Server.JsonData.Packets
             string pass = Data[3].ToString().Trim();
             string ipAddress = Data[1].ToString().Trim();
 
-            AuthStatus verificationStatus = Authentication.isCredentialsTheSame(user, pass, WebKit);
+            AuthStatus verificationStatus = Authentication.IsCredentialsTheSame(user, pass, WebKit);
 
             array["match"] = verificationStatus;
 
@@ -32,17 +32,16 @@ namespace WebKit.Server.JsonData.Packets
                 date = date.AddMinutes(WebKit.WebServer.SessionTime);
 
                 if (WebKit.WebSessions.Keys.Contains(ipAddress))
-                {
-                    WebKit.WebSessions.Remove(ipAddress);
-                }
+					WebKit.WebSessions.Remove(ipAddress);
 
                 WebKit.WebSessions.Add(ipAddress, date);
             }
 
             if (WebServer.ConnectList.Keys.Contains(ipAddress))
-            {
-                WebServer.ConnectList.Remove(ipAddress);
-            }
+				WebServer.ConnectList.Remove(ipAddress);
+			else
+				WebKit.Log("Client login from {0}@{1}", user, ipAddress);
+
             WebServer.ConnectList.Add(ipAddress, user);
 
             return array;

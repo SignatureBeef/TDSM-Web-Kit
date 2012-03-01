@@ -61,12 +61,26 @@ namespace WebKit.Server.JsonData
                 foreach (WebMessage chatMsg in data.Values
                     .Where(X => X.timesent.ToBinary() > timestamp))
                 {
-                    long t = chatMsg.timesent.ToBinary();
                     ret.Add(chatMsg);
                 }
             }
 
-            return ret;
+			return ret.SortByDescending();
         }
     }
+
+	public static class ListExtensions
+	{
+		public static List<WebMessage> SortByDescending(this List<WebMessage> list)
+		{
+			var ret = list.FieldwiseClone();
+			ret.Sort(IsYoungerThan);
+			return ret;
+		}
+
+		private static int IsYoungerThan(WebMessage msg1, WebMessage msg2)
+		{
+			return msg1.timesent.CompareTo(msg2.timesent);
+		}
+	}
 }
