@@ -18,7 +18,7 @@ namespace WebKit.Server
     {
         HttpListener        HttpListener        { get; set; }
         public string       IpAddress           { get; set; }
-        public int          port                { get; set; }
+        public int          Port                { get; set; }
         
         public int          SessionTime         { get; set; }
         public WebKit       WebKit              { get; set; }
@@ -44,27 +44,33 @@ namespace WebKit.Server
             }
         }
 
-        public WebServer(string IP, int Port, WebKit WebKit)
+        public WebServer(string ip, int port, WebKit WebKit)
         {
-            HttpListener = new HttpListener();
-            HttpListener.Prefixes.Add(String.Format("http://{0}:{1}/", IP, Port));
-			//HttpListener.AuthenticationSchemes = AuthenticationSchemes.IntegratedWindowsAuthentication;
-			//HttpListener.AuthenticationSchemes = AuthenticationSchemes.Ntlm;
-			//HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
-			HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
-			//HttpListener.UnsafeConnectionNtlmAuthentication = true;
-			HttpListener.IgnoreWriteExceptions = true;
+			IpAddress = ip;
+			Port = port;
 
-            ConnectList = new Dictionary<String, String>();
+			Setup();
 
+			ConnectList = new Dictionary<String, String>();
+			
             this.WebKit = WebKit;
             SessionTime = WebKit.Properties.SessionMinutes;
         }
 
+		private void Setup()
+		{
+			HttpListener = new HttpListener();
+			HttpListener.Prefixes.Add(String.Format("http://{0}:{1}/", IpAddress, Port));
+			HttpListener.IgnoreWriteExceptions = true;
+			HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
+		}
+
         public void StartServer()
         {
-            HttpListener.Start();
+			if (!HttpListener.IsListening)
+				Setup();
 
+			HttpListener.Start();			
             ThreadPool.QueueUserWorkItem(new WaitCallback(Listen));
 
             WebKit.Log("WebKit Server started on {0}", HttpListener.Prefixes.ToArray()[0]);

@@ -13,10 +13,11 @@ using Terraria_Server.Plugins;
 using System.Diagnostics;
 using WebKit.Server.Utility;
 using WebKit.Server.Misc;
+using Terraria_Server.Commands;
 
 namespace WebKit
 {
-	public class WebKit : BasePlugin
+	public partial class WebKit : BaseWebKit
 	{
 		public WebServer WebServer { get; set; }
 		public MultiArray<String, WebMessage> UserChat { get; set; }
@@ -78,6 +79,12 @@ namespace WebKit
 			//Hook(HookPoints.PlayerLeftGame, OnPlayerDisconnect);
 			//Hook(HookPoints.ConsoleMessageReceived, OnConsoleMessageReceived);
 
+			AddCommand("webserver")
+				.WithAccessLevel(AccessLevel.CONSOLE)
+				.WithDescription("Manage the WebKit Http Server.")
+				.WithHelpText("Usage:    webserver stop:start:restart")
+				.Calls(Server);
+
 			WebServer = new WebServer(Properties.IPAddress, Properties.Port, this);
 			WebServer.StartServer();
 
@@ -94,9 +101,7 @@ namespace WebKit
 		public static void Log(string fmt, params object[] args)
 		{
 			foreach (string line in String.Format(fmt, args).Split('\n'))
-			{
 				ProgramLog.Plugin.Log("[WebKit] " + line);
-			}
 		}
 
 		[Hook(HookOrder.NORMAL)]
