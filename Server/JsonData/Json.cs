@@ -15,7 +15,7 @@ using WebKit.Server.Misc;
 
 namespace WebKit.Server.JsonData
 {
-    public class Json
+    public static class Json
     {
         public const string JSON_SEPERATOR = "/data.json?request=";        
 

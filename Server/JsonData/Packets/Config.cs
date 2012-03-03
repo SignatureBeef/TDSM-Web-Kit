@@ -19,6 +19,7 @@ namespace WebKit.Server.JsonData.Packets
             Dictionary<String, Object> array = new Dictionary<String, Object>();
 
             array["maxLines"] = WebKit.Properties.MaxChatLines;
+			array["main-interval"] = WebKit.Properties.UpdateInterval;
 
             return array;
         }

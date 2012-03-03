@@ -14,7 +14,7 @@ namespace WebKit
         {
             object temp = null;
             temp = MaxChatLines;
-            temp = SessionMinutes;
+            temp = UpdateInterval;
             temp = Port;
             temp = IPAddress;
 			temp = ServerId;
@@ -32,15 +32,15 @@ namespace WebKit
             }
         }
 
-        public int SessionMinutes
+        public int UpdateInterval
         {
             get
             {
-                return getValue("max-session-time", 15);
+                return getValue("update-interval", 2000);
             }
             set
             {
-                setValue("max-session-time", value);
+				setValue("update-interval", value);
             }
         }
 

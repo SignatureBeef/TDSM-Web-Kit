@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 namespace WebKit.Server.Auth
 {
-    public class Authentication
+    public static class Authentication
     {
         public const string CREDENTIAL_LIST = "credentials.txt";
 

@@ -9,7 +9,7 @@ using Terraria_Server.WorldMod;
 
 namespace WebKit.Server.Utility
 {
-    public class Utilities
+    public static class Utilities
     {
         public static bool RestartServer(WebKit WebKit, string IPOrName)
         {
@@ -61,7 +61,5 @@ namespace WebKit.Server.Utility
 
             return false;
         }
-
-        //No point adding start
     }
 }

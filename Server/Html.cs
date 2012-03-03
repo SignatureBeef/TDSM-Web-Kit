@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Net;
 using System.Security.Principal;
 using WebKit.Server.Auth;
+using Terraria_Server.Misc;
 
 namespace WebKit.Server
 {
@@ -96,7 +97,7 @@ namespace WebKit.Server
 		public static void ProcessData(WebKit WebKit, HttpListener Listener, IAsyncResult Result)
 		{
 			try
-			{				
+			{
 				var context = Listener.EndGetContext(Result);
 
 				if (!CheckAuthenticity(context, WebKit))

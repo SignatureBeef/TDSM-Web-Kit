@@ -11,6 +11,7 @@ using Terraria_Server;
 using WebKit.Server.JsonData;
 using WebKit.Server.Auth;
 using System.Web.Script.Serialization;
+using Terraria_Server.Misc;
 
 namespace WebKit.Server
 {
@@ -54,7 +55,7 @@ namespace WebKit.Server
 			ConnectList = new Dictionary<String, String>();
 			
             this.WebKit = WebKit;
-            SessionTime = WebKit.Properties.SessionMinutes;
+            SessionTime = WebKit.Properties.UpdateInterval;
         }
 
 		private void Setup()
@@ -101,16 +102,16 @@ namespace WebKit.Server
 
         public void ListenerCallback(IAsyncResult result)
         {
-            try
-            {
+			try
+			{
 				var listener = result.AsyncState as HttpListener;
 				Html.ProcessData(WebKit, listener, result);
-            }
-            catch (ObjectDisposedException) { }
-            catch (Exception e)
-            {
-                ProgramLog.Log(e);
-            }
+			}
+			catch (ObjectDisposedException) { }
+			catch (Exception e)
+			{
+				ProgramLog.Log(e);
+			}
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WebKit.Server.JsonData
 {
-    public struct PacketId
+    public static class PacketId
     {
         public static string CHAT
         {
