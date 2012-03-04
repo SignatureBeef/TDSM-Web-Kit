@@ -105,8 +105,6 @@ namespace WebKit.Server
 				ipAddress = ipAddress.Split(':')[0];
 
 			var identity = context.User.Identity;
-			//context.Request.
-
 
 			int slot;
 			if (NeedsKick(ipAddress, identity.Name, WebKit, out slot))
@@ -146,10 +144,7 @@ namespace WebKit.Server
 									WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
 							}
 						}
-
-						//if(!Authentication.InSession(
-						//    WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
-
+						
 						if (WebKit.WebSessions.ContainsKey(basicIdentity.Name))
 						{
 							var newIdent = WebKit.WebSessions[basicIdentity.Name];
@@ -186,6 +181,8 @@ namespace WebKit.Server
 				var response = context.Response;
 				var request = context.Request.Url.AbsolutePath;
 				response.Headers.Set(HttpResponseHeader.Server, AGENT);
+
+				var agent = context.Request.UserAgent;
 
 				if ((request.StartsWith("/")))
 					request = request.Substring(1);

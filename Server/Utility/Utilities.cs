@@ -6,6 +6,7 @@ using System.Threading;
 using Terraria_Server;
 using Terraria_Server.Logging;
 using Terraria_Server.WorldMod;
+using Terraria_Server.Language;
 
 namespace WebKit.Server.Utility
 {
@@ -21,16 +22,25 @@ namespace WebKit.Server.Utility
             try
             {
                 WebKit.ServerStatus = "Restarting";
-                Terraria_Server.Server.notifyOps("Restarting the Server {" + IPOrName + "}", true);
+				Program.Restarting = true;
+				Terraria_Server.Server.notifyOps(Languages.RestartingServer + " [" + IPOrName + "]", true);
 
-                NetPlay.StopServer();
-                while (NetPlay.ServerUp) { Thread.Sleep(10); }
+				NetPlay.StopServer();
+				while (NetPlay.ServerUp) { Thread.Sleep(10); }
 
-                ProgramLog.Log("Starting the Server");
-                Main.Initialize();
-                WorldIO.LoadWorld(null, null, World.SavePath);
-                Program.updateThread = new ProgramThread("Updt", Program.UpdateLoop);
-                NetPlay.StartServer();
+				ProgramLog.Log(Languages.StartingServer);
+				Main.Initialize();
+
+				Program.LoadPlugins();
+
+				WorldIO.LoadWorld(null, null, World.SavePath);
+				Program.updateThread = new ProgramThread("Updt", Program.UpdateLoop);
+				NetPlay.StartServer();
+
+				while (!NetPlay.ServerUp) { Thread.Sleep(100); }
+
+				ProgramLog.Console.Print(Languages.Startup_YouCanNowInsertCommands);
+				Program.Restarting = false;
 
                 return true;
             }
@@ -48,7 +58,7 @@ namespace WebKit.Server.Utility
             {
                 WebKit.ServerStatus = "Exiting";
 
-                Terraria_Server.Server.notifyOps("Exiting on request. {" + IPOrName + "}", false);
+                Terraria_Server.Server.notifyOps("Exiting on request. [" + IPOrName + "]", false);
                 NetPlay.StopServer();
                 Statics.Exit = true;
 

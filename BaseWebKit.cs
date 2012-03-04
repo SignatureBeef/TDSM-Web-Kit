@@ -67,7 +67,7 @@ namespace WebKit
 			if (view)
 			{
 				var max = webKit.WebSessions.Count;
-				if (max == 0)
+				if ((from x in webKit.WebSessions where !Authentication.IsOutOfSession(x.Key, x.Value.LastUpdate, x.Value.IpAddress, webKit) select x).Count() == 0)
 				{
 					sender.sendMessage("No connections.");
 					return;

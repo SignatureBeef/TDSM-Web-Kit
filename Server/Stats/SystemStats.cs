@@ -20,15 +20,9 @@ namespace WebKit.Server.Stats
             return memCounter.NextValue();
         }
 
-        public static float GetTotalMemory()
-        {
-            //Gotta do this yet. haven't had time.
-            return memCounter.NextValue();
-        }
-
         public static float GetCPUUsage()
         {
-            return cpuCounter.NextValue();
+			return cpuCounter.NextValue();
         }
     }
 }
