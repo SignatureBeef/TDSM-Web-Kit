@@ -7,32 +7,29 @@ namespace WebKit.Server.JsonData.Packets
 {
     public struct Chat : IPacket
     {
-        public string GetPacket()
+		public Dictionary<String, Object> Data { get; set; }
+
+		public PacketId GetPacket()
         {
-            return PacketId.CHAT;
+            return PacketId.chat;
         }
 
-        public Dictionary<String, Object> Process(object[] Data)
+		public void Process(object[] args)
         {
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
+			WebKit WebKit = (WebKit)args[0];
 
-            WebKit WebKit = (WebKit)Data[0];
-
-            string timeStamp = Data[2].ToString();
+			string timeStamp = args[2].ToString();
             if (timeStamp.Trim().Length == 0)
             {
                 timeStamp = (-long.MaxValue).ToString();
             }
 
-            List<WebMessage> chatList = Json.GetUserChat(timeStamp, WebKit);
-
+            var chatList = Json.GetUserChat(timeStamp, WebKit);
             if (chatList != null)
             {
-                array["messages"] = chatList;
-                array["timesent"] = DateTime.Now.ToBinary().ToString();
+                Data["messages"] = chatList;
+				Data["timesent"] = DateTime.Now.ToBinary().ToString();
             }
-
-            return array;
         }
     }
 }

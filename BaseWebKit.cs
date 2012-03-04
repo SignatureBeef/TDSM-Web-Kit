@@ -145,7 +145,7 @@ namespace WebKit
 				if (args.TryParseTwo<String, String>(out user, out pass))
 				{
 					var hashed = Authentication.ComputeHash(user, pass, webKit.Properties.ServerId);
-					if (Authentication.AddUserCredential(user, hashed))
+					if (Authentication.AddUserCredential(user, hashed, webKit.Properties.ServerId))
 						sender.sendMessage("User `" + user + "` successfully added.");
 					else
 						sender.sendMessage("Failed to add `" + user + "` to the list.", 255, 355, 0, 0);

@@ -11,17 +11,17 @@ namespace WebKit.Server.JsonData.Packets
 {
 	public struct Utility : IPacket
 	{
-		public string GetPacket()
+		public Dictionary<String, Object> Data { get; set; }
+
+		public PacketId GetPacket()
 		{
-			return PacketId.UTILITY;
+			return PacketId.util;
 		}
 
-		public Dictionary<String, Object> Process(object[] Data)
+		public void Process(object[] args)
 		{
-			Dictionary<String, Object> array = new Dictionary<String, Object>();
-
-			WebKit WebKit = (WebKit)Data[0];
-			string IPAddress = Data[1].ToString();
+			WebKit WebKit = (WebKit)args[0];
+			string IPAddress = args[1].ToString();
 
 			/*
 			 * Restart = 0
@@ -29,31 +29,29 @@ namespace WebKit.Server.JsonData.Packets
 			 */
 
 			int Type;
-			if (Int32.TryParse(Data[2].ToString(), out Type))
+			if (Int32.TryParse(args[2].ToString(), out Type))
 			{
 				switch (Type)
 				{
 					case 0:
-						array["processed"] = Utilities.RestartServer(WebKit, IPAddress);
-						array["err"] = "Error restarting, Please check log.";
+						Data["processed"] = Utilities.RestartServer(WebKit, IPAddress);
+						Data["err"] = "Error restarting, Please check log.";
 						break;
 					case 1:
-						array["processed"] = Utilities.StopServer(WebKit, IPAddress);
-						array["err"] = "Error stopping, Please check log.";
+						Data["processed"] = Utilities.StopServer(WebKit, IPAddress);
+						Data["err"] = "Error stopping, Please check log.";
 						break;
 					default:
-						array["processed"] = false;
-						array["err"] = "Unknown utility key.";
+						Data["processed"] = false;
+						Data["err"] = "Unknown utility key.";
 						break;
 				}
 			}
 			else
 			{
-				array["processed"] = false;
-				array["err"] = "Incorrect key format.";
+				Data["processed"] = false;
+				Data["err"] = "Incorrect key format.";
 			}
-
-			return array;
 		}
 	}
 }

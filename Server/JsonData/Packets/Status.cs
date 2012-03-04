@@ -10,39 +10,37 @@ namespace WebKit.Server.JsonData.Packets
 {
     public struct Status : IPacket
     {
-        public string GetPacket()
+		public Dictionary<String, Object> Data { get; set; }
+
+		public PacketId GetPacket()
         {
-            return PacketId.STATUS;
+            return PacketId.stats;
         }
 
-        public Dictionary<String, Object> Process(object[] Data)
+        public void Process(object[] args)
         {
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
-
-            WebKit WebKit = (WebKit)Data[0];
+            WebKit WebKit = (WebKit)args[0];
 
             var process = System.Diagnostics.Process.GetCurrentProcess();
             var time = process.TotalProcessorTime;
 
-            array["status"] = WebKit.ServerStatus;
-            array["time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            array["users"] = Terraria_Server.Networking.ClientConnection.All.Count;
-			array["maxusers"] = SlotManager.MaxSlots;
-			array["userlist"] = Json.GetUserList();
-			array["ready"] = NetPlay.ServerUp;
+            Data["status"] = WebKit.ServerStatus;
+            Data["time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            Data["users"] = Terraria_Server.Networking.ClientConnection.All.Count;
+			Data["maxusers"] = SlotManager.MaxSlots;
+			Data["userlist"] = Json.GetUserList();
+			Data["ready"] = NetPlay.ServerUp;
 
-            array["cpu"] = String.Format("{0:0.00}% ({1})",
+            Data["cpu"] = String.Format("{0:0.00}% ({1})",
                 SystemStats.GetCPUUsage(), time);
 
-            array["virmem"] = String.Format("{0:0.0}/{1:0.0}MB",
+            Data["virmem"] = String.Format("{0:0.0}/{1:0.0}MB",
                 process.VirtualMemorySize64 / 1024.0 / 1024.0,
                 process.PeakVirtualMemorySize64 / 1024.0 / 1024.0);
 
-            array["phymem"] = String.Format("{0:0.0}/{1:0.0}MB",
+            Data["phymem"] = String.Format("{0:0.0}/{1:0.0}MB",
                 SystemStats.GetMemoryUsage() / 1024.0 / 1024.0,
                 process.PeakWorkingSet64 / 1024.0 / 1024.0);
-
-            return array;
         }
     }
 }

@@ -20,17 +20,24 @@ namespace WebKit.Server.Auth
             }
         }
 
-        public static void Init()
+        public static void Init(string serverId)
         {
-            if (!File.Exists(CredentialPath))
+			var path = CredentialPath;
+			if (!File.Exists(path))
             {
-                string user = "admin", pass = HashString(user);
-                string Header = "#Format: username:sha1hash\n#Lines starting with '#' will not be read\n\n" +
-                    user + ":" + pass;
+				string user = "admin", pass = ComputeHash(user, "admin", serverId);
 
                 try
                 {
-                    File.WriteAllText(CredentialPath, Header);
+					File.WriteAllLines(path,
+						new string[]
+						{
+							"#Format: username:sha1hash",
+							"#Lines starting with '#' will not be read",
+							String.Empty, String.Empty,
+							user + ":" + pass
+						}
+					);
                 }
                 catch (Exception e)
                 {
@@ -68,12 +75,17 @@ namespace WebKit.Server.Auth
             return credentials;
         }
 
-		public static bool AddUserCredential(string user, string hash)
+		public static bool AddUserCredential(string user, string hash, string serverId = "")
 		{
 			try
 			{
-				var line = user + ":" + hash;
-				File.AppendAllLines(CredentialPath, new string[] { line });
+				var lines = new string[] { user + ":" + hash };
+				var path = CredentialPath;
+
+				if (File.Exists(path))
+					Init(serverId);
+				else
+					File.WriteAllLines(path, lines);
 
 				return true;
 			}

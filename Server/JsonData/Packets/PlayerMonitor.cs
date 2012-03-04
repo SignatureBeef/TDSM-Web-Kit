@@ -9,25 +9,23 @@ namespace WebKit.Server.JsonData.Packets
 {
     public struct PlayerMonitor : IPacket
     {
-        public string GetPacket()
+		public Dictionary<String, Object> Data { get; set; }
+
+		public PacketId GetPacket()
         {
-            return PacketId.PLAYER_MONITOR;
+            return PacketId.pdata;
         }
 
-        public Dictionary<String, Object> Process(object[] Data)
+        public void Process(object[] args)
         {
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
+            WebKit WebKit = (WebKit)args[0];
 
-            WebKit WebKit = (WebKit)Data[0];
-
-            var Player = Terraria_Server.Server.GetPlayerByName(Data[2].ToString());
+            var Player = Terraria_Server.Server.GetPlayerByName(args[2].ToString());
 
             if (Player == null)
-                array["data"] = "Player is no longer online.";
+                Data["data"] = "Player is no longer online.";
             else
-                array["data"] = UserMoniter.SerializePlayer(Player);
-
-            return array;
+                Data["data"] = UserMoniter.SerializePlayer(Player);
         }
     }
 }

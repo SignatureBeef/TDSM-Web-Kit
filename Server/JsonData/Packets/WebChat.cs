@@ -7,22 +7,20 @@ namespace WebKit.Server.JsonData.Packets
 {
     public struct WebChat : IPacket
     {
-        public string GetPacket()
+		public Dictionary<String, Object> _data;
+		public Dictionary<String, Object> Data { get { return _data; } set { return; } }
+
+		public PacketId GetPacket()
         {
-            return PacketId.WEB_CHAT;
+            return PacketId.webchat;
         }
 
-        public Dictionary<String, Object> Process(object[] Data)
+		public void Process(object[] args)
         {
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
-            string msg = Data[2].ToString().Trim();
+			string msg = args[2].ToString().Trim();
 
             if (msg.Contains("="))
-            {
-                Terraria_Server.Server.notifyAll("Web: " + msg);
-            }
-            
-            return array;
+				Terraria_Server.Server.notifyAll("Web: " + msg);
         }
     }
 }

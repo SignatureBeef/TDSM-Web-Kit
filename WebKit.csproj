@@ -55,10 +55,8 @@
     <Compile Include="Server\JsonData\PacketId.cs" />
     <Compile Include="Server\JsonData\Packets\Chat.cs" />
     <Compile Include="Server\JsonData\Packets\Config.cs" />
-    <Compile Include="Server\JsonData\Packets\Credentials.cs" />
     <Compile Include="Server\JsonData\Packets\IPacket.cs" />
     <Compile Include="Server\JsonData\Packets\PlayerMonitor.cs" />
-    <Compile Include="Server\JsonData\Packets\SessionAuth.cs" />
     <Compile Include="Server\JsonData\Packets\Status.cs" />
     <Compile Include="Server\JsonData\Packets\Utility.cs" />
     <Compile Include="Server\JsonData\Packets\WebChat.cs" />

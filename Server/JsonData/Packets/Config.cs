@@ -6,22 +6,20 @@ using System.Text;
 namespace WebKit.Server.JsonData.Packets
 {
     public struct Config : IPacket
-    {
-        public string GetPacket()
+	{
+		public Dictionary<String, Object> Data { get; set; }
+
+		public PacketId GetPacket()
         {
-            return PacketId.CONFIG;
+            return PacketId.config;
         }
 
-        public Dictionary<String, Object> Process(object[] Data)
+		public void Process(object[] args)
         {
-            WebKit WebKit = (WebKit)Data[0];
-
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
-
-            array["maxLines"] = WebKit.Properties.MaxChatLines;
-			array["main-interval"] = WebKit.MainUpdateInterval;
-
-            return array;
+            WebKit WebKit = (WebKit)args[0];
+			
+            Data["maxLines"] = WebKit.Properties.MaxChatLines;
+			Data["main-interval"] = WebKit.MainUpdateInterval;
         }
     }
 }

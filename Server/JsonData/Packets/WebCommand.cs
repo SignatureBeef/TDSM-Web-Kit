@@ -7,21 +7,20 @@ using Terraria_Server;
 namespace WebKit.Server.JsonData.Packets
 {
     public struct WebCommand : IPacket
-    {
-        public string GetPacket()
+	{
+		public Dictionary<String, Object> Data { get; set; }
+
+		public PacketId GetPacket()
         {
-            return PacketId.WEB_COMMAND;
+            return PacketId.webcommand;
         }
 
-        public Dictionary<String, Object> Process(object[] Data)
+        public void Process(object[] args)
         {
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
-
-            WebKit WebKit = (WebKit)Data[0];
-            string Command = Data[2].ToString();
+            WebKit WebKit = (WebKit)args[0];
+            string Command = args[2].ToString();
 
             Program.commandParser.ParseAndProcess(WebKit.WebSender, Command);
-            return array;
         }
     }
 }

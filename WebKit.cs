@@ -67,7 +67,7 @@ namespace WebKit
 
 			MainUpdateInterval = Properties.UpdateInterval;
 
-			Authentication.Init();
+			Authentication.Init(Properties.ServerId);
 		}
 
 		protected override void Enabled()

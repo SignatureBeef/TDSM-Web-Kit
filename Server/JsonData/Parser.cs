@@ -24,6 +24,7 @@ namespace WebKit.Server.JsonData
                 .SelectMany(clazz => clazz.GetTypes()).Where(x => type.IsAssignableFrom(x) && x != type && !x.IsAbstract))
             {
                 IPacket message = (IPacket)Activator.CreateInstance(messageType);
+				message.Data = new Dictionary<String, Object>();
 
                 array.Add(message);
             }
@@ -31,12 +32,15 @@ namespace WebKit.Server.JsonData
             return array;
         }
 
-        public static Dictionary<String, Object> ProcessPacket(string Id, object[] Data)
+        public static string ProcessPacket(string Id, object[] Data)
         {
 			try
 			{
-				foreach (IPacket packet in Packets.Where(x => x.GetPacket().Equals(Id)))
-					return packet.Process(Data);
+				foreach (IPacket packet in Packets.Where(x => x.GetPacket().ToString().Equals(Id)))
+				{
+					packet.Process(Data);
+					return packet.ToJSON();
+				}
 			}
 			catch (ExitException) { throw; }
 			catch (Exception e)
@@ -80,12 +84,12 @@ namespace WebKit.Server.JsonData
 
 						paremeters.Insert(0, WebKit);
 
-						var array = ProcessPacket(Id, paremeters.ToArray<Object>());
+						var serialized = ProcessPacket(Id, paremeters.ToArray<Object>());
 
-						if (array == null)
-							return;
+						//if (array == null)
+						//    return;
 
-						string serialized = Json.Serialize(WebKit.WebServer.serializer, array);
+						//string serialized = Json.Serialize(WebKit.WebServer.serializer, array);
 						//Html.SendData(String.Empty, context, Encoding.ASCII.GetBytes(serialized));
 						context.WriteString(String.Empty, serialized);
 					}
