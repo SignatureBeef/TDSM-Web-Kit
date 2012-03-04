@@ -15,36 +15,36 @@ namespace WebKit.Server.JsonData.Packets
 
         public Dictionary<String, Object> Process(object[] Data)
         {
-            Dictionary<String, Object> array = new Dictionary<String, Object>();
+			//Dictionary<String, Object> array = new Dictionary<String, Object>();
 
-            WebKit WebKit = (WebKit)Data[0];
-            string user = Data[2].ToString().Trim();
-            string pass = Data[3].ToString().Trim();
-            string ipAddress = Data[1].ToString().Trim();
+			//WebKit WebKit = (WebKit)Data[0];
+			//string user = Data[2].ToString().Trim();
+			//string pass = Data[3].ToString().Trim();
+			//string ipAddress = Data[1].ToString().Trim();
 
-            AuthStatus verificationStatus = Authentication.IsCredentialsTheSame(user, pass, WebKit);
+			//AuthStatus verificationStatus = Authentication.IsCredentialsTheSame(user, pass, WebKit);
 
-            array["match"] = verificationStatus;
+			//array["match"] = verificationStatus;
 
-            if (verificationStatus == AuthStatus.MATCH)
-            {
-                DateTime date = DateTime.Now;
-                date = date.AddMinutes(WebKit.WebServer.SessionTime);
+			//if (verificationStatus == AuthStatus.MATCH)
+			//{
+			//    DateTime date = DateTime.Now;
+			//    date = date.AddMinutes(WebKit.WebServer.SessionTime);
 
-                if (WebKit.WebSessions.Keys.Contains(ipAddress))
-					WebKit.WebSessions.Remove(ipAddress);
+			//    if (WebKit.WebSessions.Keys.Contains(ipAddress))
+			//        WebKit.WebSessions.Remove(ipAddress);
 
-                WebKit.WebSessions.Add(ipAddress, date);
-            }
+			//    WebKit.WebSessions.Add(ipAddress, date);
+			//}
 
-            if (WebServer.ConnectList.Keys.Contains(ipAddress))
-				WebServer.ConnectList.Remove(ipAddress);
-			else
-				WebKit.Log("Client login from {0}@{1}", user, ipAddress);
+			//if (WebServer.ConnectList.Keys.Contains(ipAddress))
+			//    WebServer.ConnectList.Remove(ipAddress);
+			//else
+			//    WebKit.Log("Client login from {0}@{1}", user, ipAddress);
 
-            WebServer.ConnectList.Add(ipAddress, user);
+			//WebServer.ConnectList.Add(ipAddress, user);
 
-            return array;
+            return null;
         }
     }
 }

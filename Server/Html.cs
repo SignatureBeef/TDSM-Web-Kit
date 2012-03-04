@@ -41,6 +41,12 @@ namespace WebKit.Server
 		}
 	}
 
+	public struct Identity
+	{
+		public string IpAddress { get; set; }
+		public DateTime LastUpdate { get; set; }
+	}
+
 	public static class Html
 	{
 		public const String AGENT = "TDSM WebKit";
@@ -58,28 +64,106 @@ namespace WebKit.Server
 			};
 		}
 
-		public static bool CheckAuthenticity(HttpListenerContext context, WebKit WebKit)
+		public static bool NeedsKick(string ipAddress, string name, WebKit webKit, out int index)
 		{
-			var ipAddress = context.Request.UserHostAddress;
+			index = default(Int32);
+			lock (webKit.KickList)
+			{
+				var list = webKit.KickList;
+				//foreach (var pair in list)
+				for (var i = 0; i < list.Count; i++)
+				{
+					var pair = list.ElementAt(i);
+					if (pair.Key == name && pair.Value.IpAddress == ipAddress)
+					{
+						index = i;
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		public static void RemoveKickedUser(string ipAddress, string name, WebKit webKit, int slot)
+		{
+			lock (webKit.KickList)
+			{
+				var list = webKit.KickList.FieldwiseClone();
+				foreach (var pair in list)
+				{
+					if (pair.Key == name && pair.Value.IpAddress == ipAddress)
+						webKit.KickList.RemoveAt(slot);
+				}
+			}
+		}
+
+		public static bool CheckAuthenticity(HttpListenerContext context, WebKit WebKit, string httpData)
+		{
+			var ipAddress = context.Request.RemoteEndPoint.Address.ToString();
 			if (ipAddress != null)
 				ipAddress = ipAddress.Split(':')[0];
 
 			var identity = context.User.Identity;
+			//context.Request.
+
+
+			int slot;
+			if (NeedsKick(ipAddress, identity.Name, WebKit, out slot))
+			{
+				RemoveKickedUser(ipAddress, identity.Name, WebKit, slot);
+
+				var res = new Dictionary<String, Object>();
+				res["main-interval-rm"] = "http://tdsm.org";
+				var serialized = Json.Serialize(WebKit.WebServer, res);
+				context.WriteString(serialized);
+
+				WebKit.Log("{0} disconnected from {1}", identity.Name, ipAddress ?? "HTTP");
+				return false;
+			}
+
 			switch (identity.AuthenticationType)
 			{
 				case "Basic":
 					var basicIdentity = (identity as HttpListenerBasicIdentity).ToTDSMIdentity(WebKit);
 
-					if (basicIdentity.AuthStatus != AuthStatus.MATCH)
+					lock (WebKit.WebSessions)
 					{
-						context.Disconnect("Credentials incorrect.");
-						WebKit.Log("{0} disconnected from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
-						return false;
+						if (basicIdentity.AuthStatus != AuthStatus.MATCH)
+						{
+							context.Disconnect("Credentials incorrect.");
+							WebKit.Log("{0} disconnected from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
+							return false;
+						}
+						else
+						{
+							Identity ident;
+							if (!WebKit.WebSessions.ContainsKey(basicIdentity.Name))
+								WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
+							else if (WebKit.WebSessions.TryGetValue(basicIdentity.Name, out ident))
+							{
+								if ((DateTime.Now - ident.LastUpdate).TotalMilliseconds > (WebKit.MainUpdateInterval * 2))
+									WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
+							}
+						}
+
+						//if(!Authentication.InSession(
+						//    WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
+
+						if (WebKit.WebSessions.ContainsKey(basicIdentity.Name))
+						{
+							var newIdent = WebKit.WebSessions[basicIdentity.Name];
+							newIdent.IpAddress = ipAddress;
+							newIdent.LastUpdate = DateTime.Now;
+							WebKit.WebSessions[basicIdentity.Name] = newIdent;
+						}
+						else
+							WebKit.WebSessions[basicIdentity.Name] = new Identity()
+								{
+									IpAddress = ipAddress,
+									LastUpdate = DateTime.Now
+								};
 					}
-
-					//if(!Authentication.InSession(
-					//    WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
-
 					return true;
 				//case "NTLM":
 				//    var identity = iIdentity as WindowsIdentity;
@@ -99,40 +183,19 @@ namespace WebKit.Server
 			try
 			{
 				var context = Listener.EndGetContext(Result);
-
-				if (!CheckAuthenticity(context, WebKit))
-					return;
-
 				var response = context.Response;
 				var request = context.Request.Url.AbsolutePath;
-
 				response.Headers.Set(HttpResponseHeader.Server, AGENT);
 
-
-
-				//var identity = context.User.Identity as HttpListenerBasicIdentity;
-
-				//var pass = identity.Password;
-
-				//if (!identity.IsAuthenticated)
-				//{
-				//    SendData(String.Empty, context, ASCIIEncoding.ASCII.GetBytes("Not authorised!"));
-				//    context.Response.Close();
-				//    return;
-				//}
-
-
 				if ((request.StartsWith("/")))
-				{
 					request = request.Substring(1);
-				}
-
-				if ((request.EndsWith("/") || request.Equals("")))
-				{
+				if ((request.EndsWith("/") || request.Equals(String.Empty)))
 					request = request + WebServer.IndexPage;
-				}
 
 				request = WebServer.RootPath + Path.DirectorySeparatorChar + request.Replace('/', Path.DirectorySeparatorChar);
+
+				if (!CheckAuthenticity(context, WebKit, request))
+					return;
 
 				if (!Json.ProcessJsonHeader(WebKit, context))
 					ProcessResponse(request, context);
@@ -146,7 +209,7 @@ namespace WebKit.Server
 			}
 		}
 
-		public static void SendData(string httpData, HttpListenerContext context, byte[] respByte)
+		public static void SendData(this HttpListenerContext context, string httpData, byte[] respByte)
 		{
 			context.Response.ContentLength64 = respByte.Length;
 			context.Response.ContentType = GetContentType(httpData);
@@ -154,14 +217,24 @@ namespace WebKit.Server
 			context.Response.OutputStream.Close();
 		}
 
+		public static void WriteString(this HttpListenerContext ctx, string httpData, string text)
+		{
+			ctx.SendData(httpData, ASCIIEncoding.ASCII.GetBytes(text));
+		}
+
+		public static void WriteString(this HttpListenerContext ctx, string text)
+		{
+			ctx.SendData(String.Empty, ASCIIEncoding.ASCII.GetBytes(text));
+		}
+
 		public static void ProcessResponse(string requestData, HttpListenerContext context)
 		{
 			try
 			{
 				if (!File.Exists(requestData))
-					SendData(requestData, context, ASCIIEncoding.ASCII.GetBytes("Sorry that page is not found."));
+					context.SendData(requestData, ASCIIEncoding.ASCII.GetBytes("Sorry that page is not found."));
 				else
-					SendData(requestData, context, File.ReadAllBytes(requestData));
+					context.SendData(requestData, File.ReadAllBytes(requestData));
 			}
 			catch (Exception ex)
 			{
@@ -216,7 +289,7 @@ namespace WebKit.Server
 
 		public static void Disconnect(this HttpListenerContext ctx, string Message)
 		{
-			SendData(String.Empty, ctx, ASCIIEncoding.ASCII.GetBytes(Message));
+			ctx.SendData(String.Empty, ASCIIEncoding.ASCII.GetBytes(Message));
 			ctx.Response.Close();
 		}
 	}

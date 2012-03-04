@@ -35,10 +35,15 @@ namespace WebKit.Server.JsonData
             return false;
         }
 
-        public static string Serialize(JavaScriptSerializer serializer, Dictionary<String, Object> data)
+        public static string Serialize(JavaScriptSerializer serializer, object data)
         {
             return serializer.Serialize(data);
         }
+
+		public static string Serialize(WebServer Server, object data)
+		{
+			return Server.serializer.Serialize(data);
+		}
 
         public static List<String> GetUserList()
         {
@@ -54,7 +59,7 @@ namespace WebKit.Server.JsonData
         public static List<WebMessage> GetUserChat(string TimeStamp, WebKit WebKit)
         {
             List<WebMessage> ret = new List<WebMessage>();
-            MultiArray<String, WebMessage> data = WebKit.UserChat;
+            MultiArray<String, WebMessage> data = WebKit.UserChat.FieldwiseClone();
             long timestamp;
             if (long.TryParse(TimeStamp, out timestamp))
             {

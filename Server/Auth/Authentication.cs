@@ -68,6 +68,44 @@ namespace WebKit.Server.Auth
             return credentials;
         }
 
+		public static bool AddUserCredential(string user, string hash)
+		{
+			try
+			{
+				var line = user + ":" + hash;
+				File.AppendAllLines(CredentialPath, new string[] { line });
+
+				return true;
+			}
+			catch { }
+
+			return false;
+		}
+
+		public static bool CleanOutUser(string user)
+		{
+			try
+			{
+				var lines = File.ReadAllLines(CredentialPath);
+				using (var ctx = File.OpenWrite(CredentialPath))
+				{
+					var find = user.ToLower();
+					foreach (var line in lines.Where(x => x.Contains(';')))
+					{
+						var userName = line.Split(':').ElementAt(0).ToLower();
+						if (find != userName)
+						{
+							var bytes = Encoding.ASCII.GetBytes(line);
+							ctx.Write(bytes, 0, bytes.Length);
+						}
+					}
+				}
+			}
+			catch { }
+
+			return false;
+		}
+
         public static string HashString(string hashee)
         {
             SHA1 sha1 = SHA1.Create();
@@ -117,21 +155,26 @@ namespace WebKit.Server.Auth
             return AuthStatus.NON_EXISTANT_PASS;
         }
 
-        public static bool InSession(string IPaddress, WebKit WebKit)
-        {
-            Dictionary<String, DateTime> sessions = WebKit.WebSessions;
-            for (int i = 0; i < sessions.Keys.Count; i++)
-            {
-                if (sessions.Keys.ToArray()[i].Equals(IPaddress))
-                {
-                    if (sessions.Values.ToArray()[i].ToBinary() >= DateTime.Now.ToBinary())
-                    {
-                        return true;
-                    }
-                }
-            }
+		//public static bool InSession(string IPaddress, WebKit WebKit)
+		//{
+		//    Dictionary<String, DateTime> sessions = WebKit.WebSessions;
+		//    for (int i = 0; i < sessions.Keys.Count; i++)
+		//    {
+		//        if (sessions.Keys.ToArray()[i].Equals(IPaddress))
+		//        {
+		//            if (sessions.Values.ToArray()[i].ToBinary() >= DateTime.Now.ToBinary())
+		//            {
+		//                return true;
+		//            }
+		//        }
+		//    }
 
-            return false;
-        }
+		//    return false;
+		//}
+
+		public static bool IsOutOfSession(string name, DateTime last, string ipAddress, WebKit WebKit)
+		{
+			return (DateTime.Now - last).TotalMilliseconds > (WebKit.MainUpdateInterval * 2);
+		}
     }
 }

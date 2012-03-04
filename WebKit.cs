@@ -21,11 +21,13 @@ namespace WebKit
 	{
 		public WebServer WebServer { get; set; }
 		public MultiArray<String, WebMessage> UserChat { get; set; }
-		public Dictionary<String, DateTime> WebSessions { get; set; }
+		public Dictionary<String, Identity> WebSessions { get; set; }
 		public List<Credential> CredentialList { get; set; }
 		public Properties Properties { get; set; }
 		public string ServerStatus { get; set; }
 		public WebSender WebSender { get; set; }
+		public int MainUpdateInterval { get; set; }
+		public List<KeyValuePair<String, Identity>> KickList { get; set; }
 
 		public static string PluginPath
 		{
@@ -63,6 +65,8 @@ namespace WebKit
 
 			Properties.Save(false);
 
+			MainUpdateInterval = Properties.UpdateInterval;
+
 			Authentication.Init();
 		}
 
@@ -70,7 +74,8 @@ namespace WebKit
 		{
 			UserChat = new MultiArray<String, WebMessage>();
 			CredentialList = Authentication.GetCredentials();
-			WebSessions = new Dictionary<String, DateTime>();
+			WebSessions = new Dictionary<String, Identity>();
+			KickList = new List<KeyValuePair<String, Identity>>();
 
 			WebSender = new WebSender(this);
 
@@ -84,6 +89,19 @@ namespace WebKit
 				.WithDescription("Manage the WebKit Http Server.")
 				.WithHelpText("Usage:    webserver stop:start:restart")
 				.Calls(Server);
+			AddCommand("webconnection")
+				.WithAccessLevel(AccessLevel.CONSOLE)
+				.WithDescription("Manage Http connections to WebKit.")
+				.WithHelpText("Usage:    connection view")
+				.WithHelpText("          connection kick <id>")
+				.Calls(Connection);
+			AddCommand("webusers")
+				.WithAccessLevel(AccessLevel.CONSOLE)
+				.WithDescription("Manage Htp users.")
+				.WithHelpText("Usage:    webusers add <user> <pass>")
+				.WithHelpText("          webusers remove <user>")
+				.WithHelpText("          webusers reloadconfig")
+				.Calls(Users);
 
 			WebServer = new WebServer(Properties.IPAddress, Properties.Port, this);
 			WebServer.StartServer();

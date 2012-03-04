@@ -86,7 +86,8 @@ namespace WebKit.Server.JsonData
 							return;
 
 						string serialized = Json.Serialize(WebKit.WebServer.serializer, array);
-						Html.SendData(String.Empty, context, Encoding.ASCII.GetBytes(serialized));
+						//Html.SendData(String.Empty, context, Encoding.ASCII.GetBytes(serialized));
+						context.WriteString(String.Empty, serialized);
 					}
 				}
 			}
