@@ -1,16 +1,15 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Terraria_Server.Logging;
 using WebKit.Server;
 using System.IO;
 using Terraria_Server;
 using WebKit.Server.JsonData;
 using WebKit.Server.Auth;
-using System.Web.Script.Serialization;
 using Terraria_Server.Plugins;
-using System.Diagnostics;
 using WebKit.Server.Utility;
 using WebKit.Server.Misc;
 using Terraria_Server.Commands;
@@ -59,7 +58,7 @@ namespace WebKit
 
 			Properties = new Properties(PluginPath + Path.DirectorySeparatorChar + "WebKit.config");
 			Properties.Load();
-			Properties.pushData();
+			Properties.PustData();
 
 			if (Properties.ServerId == String.Empty)
 				Properties.ServerId = "tdsm-" + Main.rand.Next(0, Int32.MaxValue);
@@ -154,14 +153,14 @@ namespace WebKit
 			AddChatLine(args.Message, ctx.Sender.Name, prefix);
 		}
 
-		public void AddChatLine(string ServerMessage, string Sender = "Server", string Rank = "")
+		public void AddChatLine(string serverMessage, string sender = "Server", string rank = "")
 		{
 			string time = DateTime.Now.ToBinary().ToString();
 			if (UserChat.ContainsKey(time))
 				time = DateTime.Now.AddMilliseconds(-1).ToBinary().ToString();
 
 			UserChat.Add(time,
-				new WebMessage(Sender, ServerMessage.Trim(), Rank, DateTime.Now));
+				new WebMessage(sender, serverMessage.Trim(), rank, DateTime.Now));
 		}
 	}
 }

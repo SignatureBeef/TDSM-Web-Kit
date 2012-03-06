@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 
 namespace WebKit.Server.Auth
 {

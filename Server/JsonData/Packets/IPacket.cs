@@ -1,23 +1,15 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
 using System.Web.Script.Serialization;
-using WebKit.Server.Utility;
+using Terraria_Server.Logging;
 
 namespace WebKit.Server.JsonData.Packets
 {
-	//public interface IPacket
-	//{
-	//    string GetPacket();
-
-	//    Dictionary<String, Object> Process(object[] Data);
-	//}
-
 	public interface IPacket
 	{
-		Dictionary<String, Object> Data { get; set; }
 		PacketId GetPacket();
 
 		void Process(Args args);
@@ -25,7 +17,6 @@ namespace WebKit.Server.JsonData.Packets
 
 	public struct Args
 	{
-		//public WebSender Sender { get; set; }
 		public WebKit WebKit { get; set; }
 		public string AuthName { get; set; }
 		public string IpAddress { get; set; }
@@ -33,41 +24,72 @@ namespace WebKit.Server.JsonData.Packets
 
 		public int Count
 		{
-			get { return Arguments.Length; }
+			get { return this.Arguments.Length; }
 		}
 
 		public object this[int index]
 		{
-			get { return Arguments[index]; }
-			set { Arguments[index] = value; }
+			get { return this.Arguments[index]; }
+			set { this.Arguments[index] = value; }
 		}
 
 		public object ElementAt(int index)
 		{
-			return Arguments[index];
+			return this.Arguments[index];
 		}
 	}
 
-	//public interface SerializablePacket : IPacket
-	//{
-	//    string ToJSON();
-	//}
-
-	public static class IPacketExtensions
+	public abstract class SerializablePacket : IPacket
 	{
 		public static JavaScriptSerializer Serializer { get; set; }
 
-		static IPacketExtensions()
+		static SerializablePacket()
 		{
 			Serializer = new JavaScriptSerializer();
 		}
 
-		public static string ToJSON(this IPacket packet)
-	    {
-	        //var obj = packet.Data.Take(packet.Data.Count).ToArray();
-	        //var obj = packet.Data.FieldwiseClone();
-			lock(packet)
-				return Serializer.Serialize(packet.Data);
-	    }
+		private Dictionary<String, Object> _data;
+		public Dictionary<String, Object> Data
+		{
+			get
+			{
+				if (_data == null)
+					_data = Init();
+
+				lock (_data)
+					return _data;
+			}
+			set
+			{
+				if (_data == null)
+					_data = Init();
+
+				lock (_data)
+					_data = value;
+			}
+		}
+
+		public Dictionary<String, Object> Init()
+		{
+			return new Dictionary<String, Object>();
+		}
+
+		public string ToJson()
+		{
+			try
+			{
+				lock (_data) { return Serializer.Serialize(_data); }
+			}
+			catch (Exception e)
+			{
+				ProgramLog.Log("Exception in {0}", GetPacket().ToString());
+				ProgramLog.Log(e);
+				return String.Empty;
+			}
+		}
+
+		public abstract PacketId GetPacket();
+
+		public abstract void Process(Args args);
 	}
 }

@@ -1,29 +1,28 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Terraria_Server;
 using System.Reflection;
-using System.IO;
-using System.Xml.Serialization;
 using Terraria_Server.Misc;
 
 namespace WebKit.Server.Stats
 {
     public static class UserMoniter
     {
-        public static List<String> SerializePlayer(Player Player)
+        public static List<String> SerializePlayer(Player player)
         {
             List<String> data = new List<String>();
 
-            foreach (PropertyInfo info in Player.GetType().GetProperties())
+            foreach (PropertyInfo info in player.GetType().GetProperties())
             {
                 try
                 {
                     string pInfo = info.Name + ":";
-                    Type mType = info.GetValue(Player, null).GetType();
+					//Type mType = info.GetValue(player, null).GetType();
 
-                    object variable = info.GetValue(Player, null);
+                    object variable = info.GetValue(player, null);
                     if(variable is Vector2)
                     {
                         Vector2 vVar = (Vector2)variable;

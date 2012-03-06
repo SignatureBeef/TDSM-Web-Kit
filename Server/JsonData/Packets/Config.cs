@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public struct Config : IPacket
+    public class Config : SerializablePacket
 	{
-		public Dictionary<String, Object> Data { get; set; }
-
-		public PacketId GetPacket()
+		public override PacketId GetPacket()
         {
-            return PacketId.config;
+            return PacketId.Config;
         }
 
-		public void Process(Args args)
+		public override void Process(Args args)
         {
 			var webKit = args.WebKit;
 			Data["maxLines"] = webKit.Properties.MaxChatLines;

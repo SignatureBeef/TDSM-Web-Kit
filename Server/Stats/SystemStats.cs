@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Diagnostics;
-using System.ComponentModel;
 
 namespace WebKit.Server.Stats
 {
@@ -20,7 +19,7 @@ namespace WebKit.Server.Stats
             return memCounter.NextValue();
         }
 
-        public static float GetCPUUsage()
+        public static float GetCpuUsage()
         {
 			return cpuCounter.NextValue();
         }

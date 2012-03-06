@@ -1,21 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public struct Chat : IPacket
+    public class Chat : SerializablePacket
     {
-		public Dictionary<String, Object> Data { get; set; }
-
-		public PacketId GetPacket()
+		public override PacketId GetPacket()
         {
-            return PacketId.chat;
+            return PacketId.Chat;
         }
 
-		public void Process(Args args)
+		public override void Process(Args args)
         {
+			if (args.Count == 0 || args[0].ToString() == "undefined")
+			{
+				Data["messages"] = args.WebKit.UserChat.Values;
+				Data["timesent"] = DateTime.Now.ToBinary().ToString();
+				return;
+			}
+
 			string timeStamp = args[0].ToString();
             if (timeStamp.Trim().Length == 0)
             {

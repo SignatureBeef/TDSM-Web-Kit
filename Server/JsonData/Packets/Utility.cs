@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using WebKit.Server.Utility;
-using Terraria_Server.Misc;
-using Terraria_Server.WorldMod;
 using System.Threading;
 
 namespace WebKit.Server.JsonData.Packets
 {
-	public struct Utility : IPacket
+	public class Utility : SerializablePacket
 	{
-		public Dictionary<String, Object> Data { get; set; }
-
-		public PacketId GetPacket()
+		public override PacketId GetPacket()
 		{
-			return PacketId.util;
+			return PacketId.Util;
 		}
 
-		public void Process(Args args)
+		public override void Process(Args args)
 		{
 			ThreadPool.QueueUserWorkItem(Processor, args);
 		}
@@ -26,10 +22,10 @@ namespace WebKit.Server.JsonData.Packets
 		public void Processor(object state)
 		{
 			var args = (Args)state;
-			var WebKit = args.WebKit;
+			var webKit = args.WebKit;
 			var ipAddress = args.IpAddress;
 
-			lock (WebKit.ServerStatus)
+			lock (webKit.ServerStatus)
 			{
 
 				/*
@@ -37,17 +33,17 @@ namespace WebKit.Server.JsonData.Packets
 				 * Stop = 1
 				 */
 
-				int Type;
-				if (Int32.TryParse(args[0].ToString(), out Type))
+				int type;
+				if (Int32.TryParse(args[0].ToString(), out type))
 				{
-					switch (Type)
+					switch (type)
 					{
 						case 0:
-							Data["processed"] = Utilities.RestartServer(WebKit, ipAddress);
+							Data["processed"] = Utilities.RestartServer(webKit, ipAddress);
 							Data["err"] = "Error restarting, Please check log.";
 							break;
 						case 1:
-							Data["processed"] = Utilities.StopServer(WebKit, ipAddress);
+							Data["processed"] = Utilities.StopServer(webKit, ipAddress);
 							Data["err"] = "Error stopping, Please check log.";
 							break;
 						default:

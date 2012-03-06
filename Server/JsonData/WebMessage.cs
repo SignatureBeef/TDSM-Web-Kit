@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 
 namespace WebKit.Server.JsonData
 {
     public struct WebMessage
     {
-        public string sender;
-        public string message;
-        public string rank;
-        public DateTime timesent;
+        public string Sender;
+        public string Message;
+        public string Rank;
+        public DateTime TimeSent;
 
-        public WebMessage(string Sender, string Message, string Rank, DateTime Time)
+        public WebMessage(string sender, string message, string rank, DateTime timeSent)
         {
-            sender = Sender;
-            message = Message;
-            rank = Rank;
-            timesent = Time;
+            Sender = sender;
+            Message = message;
+            Rank = rank;
+            TimeSent = timeSent;
         }
     }
 }

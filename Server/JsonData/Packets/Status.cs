@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using WebKit.Server.Stats;
 using Terraria_Server.Networking;
-using Terraria_Server;
 
 namespace WebKit.Server.JsonData.Packets
 {
-    public struct Status : IPacket
+	public class Status : SerializablePacket
     {
-		public Dictionary<String, Object> Data { get; set; }
-
-		public PacketId GetPacket()
+		public override PacketId GetPacket()
         {
-            return PacketId.stats;
+            return PacketId.Stats;
         }
 
-        public void Process(Args args)
+		public override void Process(Args args)
         {
             var process = System.Diagnostics.Process.GetCurrentProcess();
             var time = process.TotalProcessorTime;
@@ -30,7 +27,7 @@ namespace WebKit.Server.JsonData.Packets
 			//Data["ready"] = NetPlay.ServerUp;
 
             Data["cpu"] = String.Format("{0:0.00}% ({1})",
-                SystemStats.GetCPUUsage(), time);
+                SystemStats.GetCpuUsage(), time);
 
             Data["virmem"] = String.Format("{0:0.0}/{1:0.0}MB",
                 process.VirtualMemorySize64 / 1024.0 / 1024.0,

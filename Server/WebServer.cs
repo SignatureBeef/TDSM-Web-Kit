@@ -1,17 +1,14 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using Terraria_Server.Logging;
 using System.IO;
-using Terraria_Server;
-using WebKit.Server.JsonData;
-using WebKit.Server.Auth;
 using System.Web.Script.Serialization;
-using Terraria_Server.Misc;
 
 namespace WebKit.Server
 {
@@ -24,7 +21,7 @@ namespace WebKit.Server
         public int          SessionTime         { get; set; }
         public WebKit       WebKit              { get; set; }
 
-        public JavaScriptSerializer serializer = new JavaScriptSerializer();
+        public JavaScriptSerializer Serializer = new JavaScriptSerializer();
 
         public static Dictionary<String, String> ConnectList { get; set; }
         
@@ -44,47 +41,46 @@ namespace WebKit.Server
             }
         }
 
-        public WebServer(string ip, int port, WebKit WebKit)
-        {
-			IpAddress = ip;
-			Port = port;
+		public WebServer(string ip, int port, WebKit webKit)
+		{
+			this.IpAddress = ip;
+			this.Port = port;
 
-			Setup();
+			this.Setup();
 
 			ConnectList = new Dictionary<String, String>();
 			
-            this.WebKit = WebKit;
-            SessionTime = WebKit.Properties.UpdateInterval;
-        }
+            this.WebKit = webKit;
+			this.SessionTime = webKit.Properties.UpdateInterval;
+		}
 
 		private void Setup()
 		{
-			HttpListener = new HttpListener();
-			HttpListener.Prefixes.Add(String.Format("http://{0}:{1}/", IpAddress, Port));
-			HttpListener.IgnoreWriteExceptions = true;
-			HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
+			this.HttpListener = new HttpListener();
+			this.HttpListener.Prefixes.Add(String.Format("http://{0}:{1}/", this.IpAddress, this.Port));
+			this.HttpListener.IgnoreWriteExceptions = true;
+			this.HttpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
 		}
 
-        public void StartServer()
-        {
-			if (!HttpListener.IsListening)
-				Setup();
+		public void StartServer()
+		{
+			if (!this.HttpListener.IsListening)
+				this.Setup();
 
-			HttpListener.Start();			
-            ThreadPool.QueueUserWorkItem(new WaitCallback(Listen));
+			this.HttpListener.Start();			
+			ThreadPool.QueueUserWorkItem(new WaitCallback(Listen));
 
-            WebKit.Log("WebKit Server started on {0}", HttpListener.Prefixes.ToArray()[0]);
-        }
-
+			WebKit.Log("WebKit Server started on {0}", this.HttpListener.Prefixes.ToArray()[0]);
+		}
 
         public void Listen(object state)
         {
             try
             {
-                while (HttpListener.IsListening)
-                {
-                    IAsyncResult result = HttpListener.BeginGetContext(new AsyncCallback(ListenerCallback), HttpListener);
-                    result.AsyncWaitHandle.WaitOne();
+				while (this.HttpListener.IsListening)
+				{
+					IAsyncResult result = this.HttpListener.BeginGetContext(new AsyncCallback(ListenerCallback), this.HttpListener);
+					result.AsyncWaitHandle.WaitOne();
                 }
             }
             catch { }
@@ -93,9 +89,9 @@ namespace WebKit.Server
         public void StopServer()
         {
             try
-            {
-                HttpListener.Close();
-            }
+			{
+				this.HttpListener.Close();
+			}
             catch (Exception e) { ProgramLog.Log(e); }
         }
 
@@ -104,7 +100,7 @@ namespace WebKit.Server
 			try
 			{
 				var listener = result.AsyncState as HttpListener;
-				Html.ProcessData(WebKit, listener, result);
+				Html.ProcessData(this.WebKit, listener, result);
 			}
 			catch (ObjectDisposedException) { }
 			catch (Exception e)

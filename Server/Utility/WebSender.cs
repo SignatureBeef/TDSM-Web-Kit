@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using Terraria_Server;
 
 namespace WebKit.Server.Utility
 {
     public class WebSender : Sender
     {
-		public WebKit _WebKit { get; set; }
-		//public string AuthName { get; set; }
-		//public string IpAddress { get; set; }
+		public WebKit WebKit { get; set; }
 
-        public WebSender(WebKit WebKit)
+        public WebSender(WebKit webKit)
         {
-            _WebKit = WebKit;
+            WebKit = webKit;
 
             Op = true;
             Name = "WEB";
@@ -22,7 +20,7 @@ namespace WebKit.Server.Utility
 
         public override void sendMessage(string Message, int A = 255, float R = 255f, float G = 0f, float B = 0f)
         {
-            _WebKit.AddChatLine(Message);
+            WebKit.AddChatLine(Message);
         }
     }
 }

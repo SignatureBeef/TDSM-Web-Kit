@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Linq;
-using System.Text;
 using Terraria_Server.Plugins;
 using Terraria_Server;
 using Terraria_Server.Commands;

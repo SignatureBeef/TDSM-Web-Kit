@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using Terraria_Server.Misc;
 
 namespace WebKit
@@ -10,7 +10,7 @@ namespace WebKit
     {
         public Properties(string propertiesPath) : base(propertiesPath) { }
 
-        public void pushData()
+        public void PustData()
         {
             object temp = null;
             temp = MaxChatLines;

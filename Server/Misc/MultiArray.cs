@@ -1,7 +1,8 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace WebKit.Server.Misc
 {
@@ -10,42 +11,42 @@ namespace WebKit.Server.Misc
         public List<K> Keys     { get; set; }
         public List<V> Values   { get; set; }
 
-        public MultiArray()
-        {
-            Keys    = new List<K>();
-            Values   = new List<V>();
-        }
+		public MultiArray()
+		{
+			this.Keys = new List<K>();
+			this.Values = new List<V>();
+		}
 
-        public void Add(K key, V val)
-        {
-            Keys.Add(key);
-            Values.Add(val);
-        }
+		public void Add(K key, V val)
+		{
+			this.Keys.Add(key);
+			this.Values.Add(val);
+		}
 
-        public void Remove(int index)
-        {
-            Keys    .RemoveAt(index);
-            Values   .RemoveAt(index);
-        }
+		public void Remove(int index)
+		{
+			this.Keys.RemoveAt(index);
+			this.Values.RemoveAt(index);
+		}
 
-        public K GetKey(int index)
-        {
-            return Keys.ToArray()[index];
-        }
+		public K GetKey(int index)
+		{
+			return this.Keys.ToArray()[index];
+		}
 
-        public V GetValue(int index)
-        {
-            return Values.ToArray()[index];
-        }
+		public V GetValue(int index)
+		{
+			return this.Values.ToArray()[index];
+		}
 
-        public bool ContainsKey(K key)
-        {
-            return Keys.Contains(key);
-        }
+		public bool ContainsKey(K key)
+		{
+			return this.Keys.Contains(key);
+		}
 
-        public bool ContainsValue(V val)
-        {
-            return Values.Contains(val);
-        }
+		public bool ContainsValue(V val)
+		{
+			return this.Values.Contains(val);
+		}
     }
 }

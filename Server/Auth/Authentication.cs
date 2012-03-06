@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,7 +52,7 @@ namespace WebKit.Server.Auth
         public static List<Credential> GetCredentials()
         {
             List<Credential> credentials = new List<Credential>();
-            int Line = 0;
+            int lineCount = 0;
             foreach (string line in File.ReadAllLines(CredentialPath))
             {
                 string cleanedLine = line.Trim();
@@ -66,11 +69,11 @@ namespace WebKit.Server.Auth
                         }
                         else
                         {
-                            WebKit.Log("Incorrect data in Auth list, Line {0}", Line);
+                            WebKit.Log("Incorrect data in Auth list, Line {0}", lineCount);
                         }
                     }
                 }
-                Line++;
+                lineCount++;
             }
             return credentials;
         }
@@ -135,30 +138,28 @@ namespace WebKit.Server.Auth
 			return HashString(user + serverId + password);
 		}
 
-		public static bool CompareHash(string input, string Hashed)
+		public static bool CompareHash(string input, string hashed)
 		{
-			//string hash = HashString(toHash);
-			return input.ToUpper().Equals(Hashed.ToUpper());
+			return input.ToUpper().Equals(hashed.ToUpper());
 		}
 
-        public static string GetUserHash(string User, WebKit WebKit)
+        public static string GetUserHash(string user, WebKit webKit)
         {
-            foreach (Credential cred in WebKit.CredentialList.Where(X => X.Username == User))
-            {
-                return cred.Sha1;
-            }
+            foreach (Credential cred in webKit.CredentialList.Where(x => x.Username == user))
+				return cred.Sha1;
+
             return null;
         }
 
-        public static AuthStatus IsCredentialsTheSame(string User, string password, WebKit WebKit)
+        public static AuthStatus IsCredentialsTheSame(string user, string password, WebKit webKit)
         {
-            string userHash = GetUserHash(User, WebKit);
+            string userHash = GetUserHash(user, webKit);
 
 			if (userHash == null)
 				return AuthStatus.NON_EXISTANT_USER;
 			else
 			{
-				var hashed = ComputeHash(User, password, WebKit.Properties.ServerId);
+				var hashed = ComputeHash(user, password, webKit.Properties.ServerId);
 
 				if (CompareHash(hashed, userHash))
 					return AuthStatus.MATCH;
@@ -166,27 +167,10 @@ namespace WebKit.Server.Auth
 
             return AuthStatus.NON_EXISTANT_PASS;
         }
-
-		//public static bool InSession(string IPaddress, WebKit WebKit)
-		//{
-		//    Dictionary<String, DateTime> sessions = WebKit.WebSessions;
-		//    for (int i = 0; i < sessions.Keys.Count; i++)
-		//    {
-		//        if (sessions.Keys.ToArray()[i].Equals(IPaddress))
-		//        {
-		//            if (sessions.Values.ToArray()[i].ToBinary() >= DateTime.Now.ToBinary())
-		//            {
-		//                return true;
-		//            }
-		//        }
-		//    }
-
-		//    return false;
-		//}
-
-		public static bool IsOutOfSession(string name, DateTime last, string ipAddress, WebKit WebKit)
+		
+		public static bool IsOutOfSession(string name, DateTime last, string ipAddress, WebKit webKit)
 		{
-			return (DateTime.Now - last).TotalMilliseconds > (WebKit.MainUpdateInterval * 2);
+			return (DateTime.Now - last).TotalMilliseconds > (webKit.MainUpdateInterval * 2);
 		}
     }
 }

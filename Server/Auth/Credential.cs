@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 
 namespace WebKit.Server.Auth
 {
@@ -10,10 +10,10 @@ namespace WebKit.Server.Auth
         public string Username;
         public string Sha1;
 
-        public Credential(string User, string Sha1Hash)
-        {
-            Username = User;
-            Sha1 = Sha1Hash;
-        }
+		public Credential(string user, string sha1Hash)
+		{
+			Username = user;
+			Sha1 = sha1Hash;
+		}
     }
 }

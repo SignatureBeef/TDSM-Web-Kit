@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Threading;
 using Terraria_Server;
 using Terraria_Server.Language;
@@ -9,7 +12,7 @@ namespace WebKit.Server.Utility
 {
     public static class Utilities
     {
-        public static bool RestartServer(WebKit WebKit, string IPOrName)
+        public static bool RestartServer(WebKit webKit, string ipOrName)
         {
             /* snip, I 'could' trigger the command, but it requires sender and what not,
              * though the IP should be logged, Fake sender name maybe? 
@@ -18,9 +21,9 @@ namespace WebKit.Server.Utility
              */
             try
             {
-                WebKit.ServerStatus = "Restarting";
+				webKit.ServerStatus = "Restarting";
 				Program.Restarting = true;
-				Terraria_Server.Server.notifyOps(Languages.RestartingServer + " [" + IPOrName + "]", true);
+				Terraria_Server.Server.notifyOps(Languages.RestartingServer + " [" + ipOrName + "]", true);
 
 				NetPlay.StopServer();
 				while (NetPlay.ServerUp) { Thread.Sleep(10); }

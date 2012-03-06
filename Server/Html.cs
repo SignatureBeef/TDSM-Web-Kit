@@ -1,24 +1,20 @@
-﻿using System;
+﻿// Project:      TDSM WebKit
+// Contributors: DeathCradle
+// 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Net.Sockets;
 using Terraria_Server.Logging;
 using WebKit.Server.JsonData;
-using Terraria_Server;
-using System.Globalization;
 using System.Net;
-using System.Security.Principal;
 using WebKit.Server.Auth;
-using Terraria_Server.Misc;
 
 namespace WebKit.Server
 {
-	public struct TDSMBasicIdentity //: IIdentity
+	public struct TDSMBasicIdentity
 	{
-		//public TDSMBasicIdentity(string username, string password) : base(username, password) { }
-
 		public WebKit WebKit { get; set; }
 
 		public string Name { get; set; }
@@ -28,7 +24,7 @@ namespace WebKit.Server
 		{
 			get
 			{
-				return Authentication.IsCredentialsTheSame(Name, Password, WebKit);
+				return Authentication.IsCredentialsTheSame(this.Name, this.Password, this.WebKit);
 			}
 		}
 
@@ -36,7 +32,7 @@ namespace WebKit.Server
 		{
 			get
 			{
-				return AuthStatus == AuthStatus.MATCH;
+				return this.AuthStatus == AuthStatus.MATCH;
 			}
 		}
 	}
@@ -51,14 +47,11 @@ namespace WebKit.Server
 	{
 		public const String AGENT = "TDSM WebKit";
 
-		public static TDSMBasicIdentity ToTDSMIdentity(this HttpListenerBasicIdentity identity, WebKit WebKit)
+		public static TDSMBasicIdentity ToTDSMIdentity(this HttpListenerBasicIdentity identity, WebKit webKit)
 		{
-			//var ident = identity as TDSMBasicIdentity;
-			//ident.WebKit = WebKit;
-
 			return new TDSMBasicIdentity()
 			{
-				WebKit = WebKit,
+				WebKit = webKit,
 				Name = identity.Name,
 				Password = identity.Password
 			};
@@ -70,7 +63,6 @@ namespace WebKit.Server
 			lock (webKit.KickList)
 			{
 				var list = webKit.KickList;
-				//foreach (var pair in list)
 				for (var i = 0; i < list.Count; i++)
 				{
 					var pair = list.ElementAt(i);
@@ -98,18 +90,18 @@ namespace WebKit.Server
 			}
 		}
 
-		public static bool CheckAuthenticity(HttpListenerContext context, WebKit WebKit, string httpData, string ipAddress)
+		public static bool CheckAuthenticity(HttpListenerContext context, WebKit webkit, string httpData, string ipAddress)
 		{
 			var identity = context.User.Identity;
 
 			int slot;
-			if (NeedsKick(ipAddress, identity.Name, WebKit, out slot))
+			if (NeedsKick(ipAddress, identity.Name, webkit, out slot))
 			{
-				RemoveKickedUser(ipAddress, identity.Name, WebKit, slot);
+				RemoveKickedUser(ipAddress, identity.Name, webkit, slot);
 
 				var res = new Dictionary<String, Object>();
 				res["main-interval-rm"] = "http://tdsm.org";
-				var serialized = Json.Serialize(WebKit.WebServer, res);
+				var serialized = Json.Serialize(webkit.WebServer, res);
 				context.WriteString(serialized);
 
 				WebKit.Log("{0} disconnected from {1}", identity.Name, ipAddress ?? "HTTP");
@@ -119,9 +111,9 @@ namespace WebKit.Server
 			switch (identity.AuthenticationType)
 			{
 				case "Basic":
-					var basicIdentity = (identity as HttpListenerBasicIdentity).ToTDSMIdentity(WebKit);
+					var basicIdentity = (identity as HttpListenerBasicIdentity).ToTDSMIdentity(webkit);
 
-					lock (WebKit.WebSessions)
+					lock (webkit.WebSessions)
 					{
 						if (basicIdentity.AuthStatus != AuthStatus.MATCH)
 						{
@@ -132,28 +124,28 @@ namespace WebKit.Server
 						else
 						{
 							Identity ident;
-							if (!WebKit.WebSessions.ContainsKey(basicIdentity.Name))
+							if (!webkit.WebSessions.ContainsKey(basicIdentity.Name))
 								WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
-							else if (WebKit.WebSessions.TryGetValue(basicIdentity.Name, out ident))
+							else if (webkit.WebSessions.TryGetValue(basicIdentity.Name, out ident))
 							{
-								if ((DateTime.Now - ident.LastUpdate).TotalMilliseconds > (WebKit.MainUpdateInterval * 2))
+								if ((DateTime.Now - ident.LastUpdate).TotalMilliseconds > (webkit.MainUpdateInterval * 2))
 									WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
 							}
 						}
 
-						if (WebKit.WebSessions.ContainsKey(basicIdentity.Name))
+						if (webkit.WebSessions.ContainsKey(basicIdentity.Name))
 						{
-							var newIdent = WebKit.WebSessions[basicIdentity.Name];
+							var newIdent = webkit.WebSessions[basicIdentity.Name];
 							newIdent.IpAddress = ipAddress;
 							newIdent.LastUpdate = DateTime.Now;
-							WebKit.WebSessions[basicIdentity.Name] = newIdent;
+							webkit.WebSessions[basicIdentity.Name] = newIdent;
 						}
 						else
-							WebKit.WebSessions[basicIdentity.Name] = new Identity()
-								{
-									IpAddress = ipAddress,
-									LastUpdate = DateTime.Now
-								};
+							webkit.WebSessions[basicIdentity.Name] = new Identity()
+							{
+								IpAddress = ipAddress,
+								LastUpdate = DateTime.Now
+							};
 					}
 					return true;
 				//case "NTLM":
@@ -169,16 +161,15 @@ namespace WebKit.Server
 			}
 		}
 
-		public static void ProcessData(WebKit WebKit, HttpListener Listener, IAsyncResult Result)
+		public static void ProcessData(WebKit webKit, HttpListener listener, IAsyncResult result)
 		{
 			try
 			{
-				var context = Listener.EndGetContext(Result);
+				var context = listener.EndGetContext(result);
 				var response = context.Response;
 				var request = context.Request.Url.AbsolutePath;
 				response.Headers.Set(HttpResponseHeader.Server, AGENT);
 
-				var agent = context.Request.UserAgent;
 				var ipAddress = context.Request.RemoteEndPoint.Address.ToString();
 				if (ipAddress != null)
 					ipAddress = ipAddress.Split(':')[0];
@@ -190,12 +181,11 @@ namespace WebKit.Server
 
 				request = WebServer.RootPath + Path.DirectorySeparatorChar + request.Replace('/', Path.DirectorySeparatorChar);
 
-				if (!CheckAuthenticity(context, WebKit, request, ipAddress))
+				if (!CheckAuthenticity(context, webKit, request, ipAddress))
 					return;
 
-				if (!Json.ProcessJsonHeader(WebKit, context, context.User.Identity.Name, ipAddress))
+				if (!Json.ProcessJsonHeader(webKit, context, context.User.Identity.Name, ipAddress))
 					ProcessResponse(request, context);
-
 			}
 			catch (ObjectDisposedException) { }
 			catch (HttpListenerException) { }
@@ -246,7 +236,9 @@ namespace WebKit.Server
 				FileInfo info = new FileInfo(httpData);
 				extension = info.Extension;
 			}
-			catch { }
+			catch
+			{
+			}
 
 			string key = extension.ToLower();
 			if (key != null)
@@ -283,9 +275,9 @@ namespace WebKit.Server
 			return "application/octet-stream";
 		}
 
-		public static void Disconnect(this HttpListenerContext ctx, string Message)
+		public static void Disconnect(this HttpListenerContext ctx, string message)
 		{
-			ctx.SendData(String.Empty, ASCIIEncoding.ASCII.GetBytes(Message));
+			ctx.SendData(String.Empty, ASCIIEncoding.ASCII.GetBytes(message));
 			ctx.Response.Close();
 		}
 	}
