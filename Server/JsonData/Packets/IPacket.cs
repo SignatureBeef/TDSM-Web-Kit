@@ -78,6 +78,9 @@ namespace WebKit.Server.JsonData.Packets
 		{
 			try
 			{
+				if (_data == null)
+					_data = Init();
+
 				lock (_data) { return Serializer.Serialize(_data); }
 			}
 			catch (Exception e)
