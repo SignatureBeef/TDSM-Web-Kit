@@ -14,17 +14,15 @@ namespace WebKit.Server.JsonData.Packets
             return PacketId.chat;
         }
 
-		public void Process(object[] args)
+		public void Process(Args args)
         {
-			WebKit WebKit = (WebKit)args[0];
-
-			string timeStamp = args[2].ToString();
+			string timeStamp = args[0].ToString();
             if (timeStamp.Trim().Length == 0)
             {
                 timeStamp = (-long.MaxValue).ToString();
             }
 
-            var chatList = Json.GetUserChat(timeStamp, WebKit);
+			var chatList = Json.GetUserChat(timeStamp, args.WebKit);
             if (chatList != null)
             {
                 Data["messages"] = chatList;

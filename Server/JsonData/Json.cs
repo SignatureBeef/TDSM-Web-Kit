@@ -19,16 +19,16 @@ namespace WebKit.Server.JsonData
     {
         public const string JSON_SEPERATOR = "/data.json?request=";        
 
-        public static bool ProcessJsonHeader(WebKit WebKit, HttpListenerContext context)
+        public static bool ProcessJsonHeader(WebKit WebKit, HttpListenerContext context, string user, string ipAddress)
         {
             string RequestURL = context.Request.RawUrl;
             if (RequestURL.StartsWith(JSON_SEPERATOR))
             {
                 string data = RequestURL.Remove(0, RequestURL.IndexOf(JSON_SEPERATOR) + JSON_SEPERATOR.Length).Replace("%20", " ");
 
-                List<String> keys = data.Split('&').ToList<String>();
+				var args = data.Split('&');
 
-                Parser.ParseAndProcess(WebKit, context, keys);
+				Parser.ParseAndProcess(WebKit, context, args, user, ipAddress);
 
                 return true;
             }

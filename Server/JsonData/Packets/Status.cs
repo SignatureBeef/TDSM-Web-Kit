@@ -17,19 +17,17 @@ namespace WebKit.Server.JsonData.Packets
             return PacketId.stats;
         }
 
-        public void Process(object[] args)
+        public void Process(Args args)
         {
-            WebKit WebKit = (WebKit)args[0];
-
             var process = System.Diagnostics.Process.GetCurrentProcess();
             var time = process.TotalProcessorTime;
 
-            Data["status"] = WebKit.ServerStatus;
+			Data["status"] = args.WebKit.ServerStatus;
             Data["time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             Data["users"] = Terraria_Server.Networking.ClientConnection.All.Count;
 			Data["maxusers"] = SlotManager.MaxSlots;
 			Data["userlist"] = Json.GetUserList();
-			Data["ready"] = NetPlay.ServerUp;
+			//Data["ready"] = NetPlay.ServerUp;
 
             Data["cpu"] = String.Format("{0:0.00}% ({1})",
                 SystemStats.GetCPUUsage(), time);

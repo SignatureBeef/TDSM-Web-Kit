@@ -14,12 +14,11 @@ namespace WebKit.Server.JsonData.Packets
             return PacketId.config;
         }
 
-		public void Process(object[] args)
+		public void Process(Args args)
         {
-            WebKit WebKit = (WebKit)args[0];
-			
-            Data["maxLines"] = WebKit.Properties.MaxChatLines;
-			Data["main-interval"] = WebKit.MainUpdateInterval;
+			var webKit = args.WebKit;
+			Data["maxLines"] = webKit.Properties.MaxChatLines;
+			Data["main-interval"] = webKit.MainUpdateInterval;
         }
     }
 }

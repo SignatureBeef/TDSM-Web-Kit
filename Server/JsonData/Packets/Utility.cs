@@ -18,39 +18,49 @@ namespace WebKit.Server.JsonData.Packets
 			return PacketId.util;
 		}
 
-		public void Process(object[] args)
+		public void Process(Args args)
 		{
-			WebKit WebKit = (WebKit)args[0];
-			string IPAddress = args[1].ToString();
+			ThreadPool.QueueUserWorkItem(Processor, args);
+		}
 
-			/*
-			 * Restart = 0
-			 * Stop = 1
-			 */
+		public void Processor(object state)
+		{
+			var args = (Args)state;
+			var WebKit = args.WebKit;
+			var ipAddress = args.IpAddress;
 
-			int Type;
-			if (Int32.TryParse(args[2].ToString(), out Type))
+			lock (WebKit.ServerStatus)
 			{
-				switch (Type)
+
+				/*
+				 * Restart = 0
+				 * Stop = 1
+				 */
+
+				int Type;
+				if (Int32.TryParse(args[0].ToString(), out Type))
 				{
-					case 0:
-						Data["processed"] = Utilities.RestartServer(WebKit, IPAddress);
-						Data["err"] = "Error restarting, Please check log.";
-						break;
-					case 1:
-						Data["processed"] = Utilities.StopServer(WebKit, IPAddress);
-						Data["err"] = "Error stopping, Please check log.";
-						break;
-					default:
-						Data["processed"] = false;
-						Data["err"] = "Unknown utility key.";
-						break;
+					switch (Type)
+					{
+						case 0:
+							Data["processed"] = Utilities.RestartServer(WebKit, ipAddress);
+							Data["err"] = "Error restarting, Please check log.";
+							break;
+						case 1:
+							Data["processed"] = Utilities.StopServer(WebKit, ipAddress);
+							Data["err"] = "Error stopping, Please check log.";
+							break;
+						default:
+							Data["processed"] = false;
+							Data["err"] = "Unknown utility key.";
+							break;
+					}
 				}
-			}
-			else
-			{
-				Data["processed"] = false;
-				Data["err"] = "Incorrect key format.";
+				else
+				{
+					Data["processed"] = false;
+					Data["err"] = "Incorrect key format.";
+				}
 			}
 		}
 	}

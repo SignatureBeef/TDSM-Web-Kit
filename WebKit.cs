@@ -14,6 +14,7 @@ using System.Diagnostics;
 using WebKit.Server.Utility;
 using WebKit.Server.Misc;
 using Terraria_Server.Commands;
+using WebKit.Server.JsonData.Packets;
 
 namespace WebKit
 {
@@ -147,7 +148,7 @@ namespace WebKit
 			if (!(ctx.Sender is ConsoleSender))
 				prefix = ctx.Sender.Op ? "OP" : "RU";
 
-			if (args.Logger == ProgramLog.SendingLogger.PLAYER)
+			if (args.Logger == SendingLogger.PLAYER || args.Logger == (SendingLogger)SendingLoggerExtension.WEB)
 				return;
 
 			AddChatLine(args.Message, ctx.Sender.Name, prefix);

@@ -11,34 +11,34 @@ using Terraria_Server.Misc;
 
 namespace WebKit.Server.JsonData
 {
-    public static class Parser
-    {
-        public static List<IPacket> Packets = GetPackets();
+	public static class Parser
+	{
+		public static List<IPacket> Packets = GetPackets();
 
-        public static List<IPacket> GetPackets()
-        {
-            List<IPacket> array = new List<IPacket>();
+		public static List<IPacket> GetPackets()
+		{
+			List<IPacket> array = new List<IPacket>();
 
-            Type type = typeof(IPacket);
-            foreach (Type messageType in AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(clazz => clazz.GetTypes()).Where(x => type.IsAssignableFrom(x) && x != type && !x.IsAbstract))
-            {
-                IPacket message = (IPacket)Activator.CreateInstance(messageType);
+			Type type = typeof(IPacket);
+			foreach (Type messageType in AppDomain.CurrentDomain.GetAssemblies()
+				.SelectMany(clazz => clazz.GetTypes()).Where(x => type.IsAssignableFrom(x) && x != type && !x.IsAbstract))
+			{
+				IPacket message = (IPacket)Activator.CreateInstance(messageType);
 				message.Data = new Dictionary<String, Object>();
 
-                array.Add(message);
-            }
+				array.Add(message);
+			}
 
-            return array;
-        }
+			return array;
+		}
 
-        public static string ProcessPacket(string Id, object[] Data)
-        {
+		public static string ProcessPacket(string Id, Args args)
+		{
 			try
 			{
 				foreach (IPacket packet in Packets.Where(x => x.GetPacket().ToString().Equals(Id)))
 				{
-					packet.Process(Data);
+					packet.Process(args);
 					return packet.ToJSON();
 				}
 			}
@@ -48,49 +48,99 @@ namespace WebKit.Server.JsonData
 				ProgramLog.Log(e);
 			}
 
-            return null;
-        }
+			return null;
+		}
 
-        public static void ParseAndProcess(WebKit WebKit, HttpListenerContext context, List<String> Data)
-        {
+		public static void RemoveFirst(ref string[] args)
+		{
+			//lock (args)
+			{
+				var count = args.Count();
+				if (count > 0)
+				{
+					args = args.Skip(1).ToArray();
+				}
+			}
+		}
+
+		public static void InsertAtFirst(ref string[] args, string arg)
+		{
+			var newArgs = (string[])args.Clone();
+			var len = newArgs.Length;
+
+			Array.Resize(ref newArgs, len);
+			newArgs = (string[])newArgs.Reverse();
+
+			newArgs[len] = arg;
+			args = (string[])newArgs.Reverse();
+		}
+
+		public static void ParseAndProcess(WebKit webKit, HttpListenerContext context, string[] args, string user, string ipAddress)
+		{
 			try
 			{
-				List<Object> paremeters = WebKit.WebServer.parameters;
-				if (Data != null && Data.Count > 0)
+				if (args != null && args.Length > 0)
 				{
-					paremeters.Clear();
+					//paremeters.Clear();
 
-					string Id = Data.ToArray()[0].Trim();
-					string IPAddress = context.Request.UserHostAddress.Split(':')[0];
+					string Id = args.ElementAt(0).Trim();
 
 					if (Id != null && Id.Length > 0)
 					{
-						Data.RemoveAt(0);
+						RemoveFirst(ref args);
 
-						Data.Insert(0, IPAddress);
-
-						foreach (string param in Data)
+						for (var i = 0; i < args.Length; i++)
 						{
-							string parameter = param.Trim();
-							if (parameter.Length > 0)
+							var arg = args[i];
+							if (arg is String)
 							{
-								if (parameter.Contains('='))
+								string text = arg.Trim();
+								if (text.Length > 0)
 								{
-									parameter = parameter.Remove(0, parameter.IndexOf('=') + 1);
+									if (text.Contains('='))
+										text = text.Remove(0, text.IndexOf('=') + 1);
+
+									args[i] = text;
 								}
-								paremeters.Add(parameter);
 							}
 						}
 
-						paremeters.Insert(0, WebKit);
+						var arguments = new Args()
+						{
+							Arguments = args,
+							AuthName = user,
+							IpAddress = ipAddress,
+							WebKit = webKit
+						};
 
-						var serialized = ProcessPacket(Id, paremeters.ToArray<Object>());
+						//InsertAtFirst(
+						//Data.Insert(0, IPAddress);
 
-						//if (array == null)
-						//    return;
+						//foreach (string param in Data)
+						//{
+						//    string parameter = param.Trim();
+						//    if (parameter.Length > 0)
+						//    {
+						//        if (parameter.Contains('='))
+						//        {
+						//            parameter = parameter.Remove(0, parameter.IndexOf('=') + 1);
+						//        }
+						//        paremeters.Add(parameter);
+						//    }
+						//}
 
-						//string serialized = Json.Serialize(WebKit.WebServer.serializer, array);
-						//Html.SendData(String.Empty, context, Encoding.ASCII.GetBytes(serialized));
+						//paremeters.Insert(0, WebKit);
+
+						//var args = new Args()
+						//{
+						//    WebKit = WebKit,
+						//    Sender = new Utility.WebSender(
+						//};
+
+
+
+
+						var serialized = ProcessPacket(Id, arguments);
 						context.WriteString(String.Empty, serialized);
 					}
 				}
@@ -101,7 +151,7 @@ namespace WebKit.Server.JsonData
 			catch (Exception e)
 			{
 				ProgramLog.Log(e);
-			}            
-        }
-    }
+			}
+		}
+	}
 }

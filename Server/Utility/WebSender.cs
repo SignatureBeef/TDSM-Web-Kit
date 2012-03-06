@@ -8,7 +8,9 @@ namespace WebKit.Server.Utility
 {
     public class WebSender : Sender
     {
-        WebKit _WebKit { get; set; }
+		public WebKit _WebKit { get; set; }
+		//public string AuthName { get; set; }
+		//public string IpAddress { get; set; }
 
         public WebSender(WebKit WebKit)
         {

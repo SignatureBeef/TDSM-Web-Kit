@@ -98,12 +98,8 @@ namespace WebKit.Server
 			}
 		}
 
-		public static bool CheckAuthenticity(HttpListenerContext context, WebKit WebKit, string httpData)
+		public static bool CheckAuthenticity(HttpListenerContext context, WebKit WebKit, string httpData, string ipAddress)
 		{
-			var ipAddress = context.Request.RemoteEndPoint.Address.ToString();
-			if (ipAddress != null)
-				ipAddress = ipAddress.Split(':')[0];
-
 			var identity = context.User.Identity;
 
 			int slot;
@@ -144,7 +140,7 @@ namespace WebKit.Server
 									WebKit.Log("{0} logged in from {1}", basicIdentity.Name, ipAddress ?? "HTTP");
 							}
 						}
-						
+
 						if (WebKit.WebSessions.ContainsKey(basicIdentity.Name))
 						{
 							var newIdent = WebKit.WebSessions[basicIdentity.Name];
@@ -183,6 +179,9 @@ namespace WebKit.Server
 				response.Headers.Set(HttpResponseHeader.Server, AGENT);
 
 				var agent = context.Request.UserAgent;
+				var ipAddress = context.Request.RemoteEndPoint.Address.ToString();
+				if (ipAddress != null)
+					ipAddress = ipAddress.Split(':')[0];
 
 				if ((request.StartsWith("/")))
 					request = request.Substring(1);
@@ -191,10 +190,10 @@ namespace WebKit.Server
 
 				request = WebServer.RootPath + Path.DirectorySeparatorChar + request.Replace('/', Path.DirectorySeparatorChar);
 
-				if (!CheckAuthenticity(context, WebKit, request))
+				if (!CheckAuthenticity(context, WebKit, request, ipAddress))
 					return;
 
-				if (!Json.ProcessJsonHeader(WebKit, context))
+				if (!Json.ProcessJsonHeader(WebKit, context, context.User.Identity.Name, ipAddress))
 					ProcessResponse(request, context);
 
 			}

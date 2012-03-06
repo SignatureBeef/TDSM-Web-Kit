@@ -24,7 +24,6 @@ namespace WebKit.Server
         public int          SessionTime         { get; set; }
         public WebKit       WebKit              { get; set; }
 
-        public List<Object> parameters = new List<Object>();
         public JavaScriptSerializer serializer = new JavaScriptSerializer();
 
         public static Dictionary<String, String> ConnectList { get; set; }

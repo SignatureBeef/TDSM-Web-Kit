@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using Terraria_Server;
+using Terraria_Server.Language;
 using Terraria_Server.Logging;
 using Terraria_Server.WorldMod;
-using Terraria_Server.Language;
 
 namespace WebKit.Server.Utility
 {
@@ -52,13 +49,13 @@ namespace WebKit.Server.Utility
             return false;
         }
 
-        public static bool StopServer(WebKit WebKit, string IPOrName)
+        public static bool StopServer(WebKit webKit, string ipPOrName)
         {
             try
             {
-                WebKit.ServerStatus = "Exiting";
+				webKit.ServerStatus = "Exiting";
 
-                Terraria_Server.Server.notifyOps("Exiting on request. [" + IPOrName + "]", false);
+				Terraria_Server.Server.notifyOps("Exiting on request. [" + ipPOrName + "]", false);
                 NetPlay.StopServer();
                 Statics.Exit = true;
 

@@ -16,11 +16,9 @@ namespace WebKit.Server.JsonData.Packets
             return PacketId.pdata;
         }
 
-        public void Process(object[] args)
+        public void Process(Args args)
         {
-            WebKit WebKit = (WebKit)args[0];
-
-            var Player = Terraria_Server.Server.GetPlayerByName(args[2].ToString());
+			var Player = Terraria_Server.Server.GetPlayerByName(args[0].ToString());
 
             if (Player == null)
                 Data["data"] = "Player is no longer online.";
