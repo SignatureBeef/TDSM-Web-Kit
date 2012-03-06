@@ -11,6 +11,11 @@ namespace WebKit.Server.Stats
 {
     public static class UserMoniter
     {
+		private readonly static List<String> IgnoreFields = new List<String>()
+		{
+			"GetOpListKey"
+		};
+
         public static List<String> SerializePlayer(Player player)
         {
             List<String> data = new List<String>();
@@ -19,17 +24,20 @@ namespace WebKit.Server.Stats
             {
                 try
                 {
-                    string pInfo = info.Name + ":";
-					//Type mType = info.GetValue(player, null).GetType();
+					if (!IgnoreFields.Contains(info.Name))
+					{
+						string pInfo = info.Name + ":";
+						//Type mType = info.GetValue(player, null).GetType();
 
-                    object variable = info.GetValue(player, null);
-                    if(variable is Vector2)
-                    {
-                        Vector2 vVar = (Vector2)variable;
-                        data.Add(pInfo + variable.ToString() + " {" + vVar.X.ToString() + ", " + vVar.Y.ToString() + "}");
-                    }
-                    else
-                        data.Add(pInfo + variable.ToString());
+						object variable = info.GetValue(player, null);
+						if (variable is Vector2)
+						{
+							Vector2 vVar = (Vector2)variable;
+							data.Add(pInfo + variable.ToString() + " {" + vVar.X.ToString() + ", " + vVar.Y.ToString() + "}");
+						}
+						else
+							data.Add(pInfo + variable.ToString());
+					}
                 }
                 catch { }
             }
