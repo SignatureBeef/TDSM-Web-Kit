@@ -218,7 +218,8 @@ namespace WebKit.Server
 			try
 			{
 				if (!File.Exists(requestData))
-					context.SendData(requestData, ASCIIEncoding.ASCII.GetBytes("Sorry that page is not found."));
+					context.SendData(requestData, ASCIIEncoding.ASCII.GetBytes(
+                        String.Format ("Sorry, `{0}` could not be found.", requestData)));
 				else
 					context.SendData(requestData, File.ReadAllBytes(requestData));
 			}
